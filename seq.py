@@ -46,17 +46,29 @@ for BPM in BPM_LIST:
   ## ASCIIREPLACER END ##
   ##
   ## SHOW/REPLACE binary data at specific byte ##
+  print "file: "+FILEPRE+BPM+FILESUF
   bars=04
   bpm=100.0
   with open(seqfile, "rb") as f:
-    bytenr=1
+    bytenr=0
     while True:
-      # iterate byte number
-      bytenr++
       byte = f.read(1)
       if not byte:
         break
-      print(hex(ord(byte))) 
+      if bytenr==28:
+        print "bars: ", ord(byte) 
+      if bytenr==20:
+        print "bpm p1: ", ord(byte) 
+      if bytenr==21:
+        print "bpm p2: ", ord(byte) 
+      if bytenr==22:
+        print "bpm p3: ", ord(byte) 
+      if bytenr==23:
+        print "bpm p4: ", ord(byte) 
+      if bytenr==32:
+        print "bpm komma: ", ord(byte) 
+      bytenr=bytenr+1
+  print ""
 
 
 
