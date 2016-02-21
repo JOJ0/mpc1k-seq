@@ -30,23 +30,33 @@ REPL="acTgh" # BPM is added in for-loop below
 
 for BPM in BPM_LIST:
   BPMREPL=BPM+REPL
-  print "file: "+FILEPRE+BPM+FILESUF+", find: "+FIND+", repl: "+BPMREPL
-
   seqfile=PATH+FILEPRE+BPM+FILESUF
-  shellhexdump = subprocess.Popen(['hexdump', '-C', seqfile], stdout=subprocess.PIPE)
-  hexdumpout = shellhexdump.stdout.read()
-  assert shellhexdump.wait() == 0
-  print hexdumpout 
+  ## ASCIIREPLACER START ##
+  #print "file: "+FILEPRE+BPM+FILESUF+", find: "+FIND+", repl: "+BPMREPL
+  #shellhexdump = subprocess.Popen(['hexdump', '-C', seqfile], stdout=subprocess.PIPE)
+  #hexdumpout = shellhexdump.stdout.read()
+  #assert shellhexdump.wait() == 0
+  #print hexdumpout 
   #search_line = hexdumpout.split("Funk")
   #print search_line
-  print ""
-
+  #print ""
   if asciireplace == "y":
     print "now really replacing ascii data..."
     #perl -pi -e 's/$ENV{FIND}/$ENV{REPL}/g' FunkBG_${BPM}_8bar.SEQ;
+  ## ASCIIREPLACER END ##
+  ##
+  ## SHOW/REPLACE binary data at specific byte ##
+  bars=04
+  bpm=100.0
+  with open(seqfile, "rb") as f:
+    bytenr=1
+    while True:
+      # iterate byte number
+      bytenr++
+      byte = f.read(1)
+      if not byte:
+        break
+      print(hex(ord(byte))) 
 
-# replace binary data at specific position
-bars=04
-bpm=100.0
 
 
