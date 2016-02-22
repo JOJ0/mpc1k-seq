@@ -3,6 +3,7 @@ import sys
 import string
 import pprint
 import subprocess
+import binascii
 #if len(sys.argv) > 1:
 #  filename = sys.argv[1]
 #  print ("file used: " + str(filename))
@@ -19,9 +20,9 @@ FILESUF="_8bar.SEQ"
 BPM_LIST=[]
 #BPM_LIST=["55","60"]
 #BPM_LIST+=["60","65","70","74","78","80","84"]
-#BPM_LIST+=["92","96"]
+#BPM_LIST+=["092","096"]
 #BPM_LIST+=["100","102","106","110"]
-BPM_LIST+=["88","88.2","89.2"]
+BPM_LIST+=["088","088.1","089.2"]
 #FIND="Funk2"+BPM
 FIND="88acTght"
 #REPL="FunkBG__"
@@ -50,24 +51,21 @@ for BPM in BPM_LIST:
   bars=04
   bpm=100.0
   with open(seqfile, "rb") as f:
-    bytenr=0
+    chunknr=1
     while True:
-      byte = f.read(1)
-      if not byte:
+      chunk = f.read(8)
+      if not chunk:
         break
-      if bytenr==28:
-        print "bars: ", ord(byte) 
-      if bytenr==20:
-        print "bpm p1: ", ord(byte) 
-      if bytenr==21:
-        print "bpm p2: ", ord(byte) 
-      if bytenr==22:
-        print "bpm p3: ", ord(byte) 
-      if bytenr==23:
-        print "bpm p4: ", ord(byte) 
-      if bytenr==32:
-        print "bpm komma: ", ord(byte) 
-      bytenr=bytenr+1
+      if chunknr==4:
+        for idx,byte in enumerate(chunk):
+           if idx == 4:
+             #print "bars: ", binascii.b2a_uu(byte)
+             print "bars: ", binascii.hexlify(byte)
+      if chunknr==3:
+        print "bpm i guess?: ", binascii.hexlify(chunk)
+      if chunknr==5:
+        print "bpm komma: ", binascii.hexlify(chunk)
+      chunknr=chunknr+1
   print ""
 
 
