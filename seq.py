@@ -4,6 +4,11 @@ import string
 import pprint
 import subprocess
 import binascii
+
+def hex2dec(s):
+  """return the integer value of a hexadecimal string s"""
+  return int(s, 16)
+
 #if len(sys.argv) > 1:
 #  filename = sys.argv[1]
 #  print ("file used: " + str(filename))
@@ -13,16 +18,16 @@ import binascii
 
 # set default value here!!
 asciireplace="n"
-PATH="/Users/jojo/Music/klavier/0-MIDI & Audio Drums, Backing Tracks/drumloops_jojo/FunkBG1_SEQ/learn from/"
+PATH="/Users/jojo/Music/klavier/0-MIDI & Audio Drums, Backing Tracks/drumloops_jojo/FunkBG1_SEQ/fertig und auf mpc/"
 # wav file name consisting of TWO 8 char strings, !not in a row!
 FILEPRE="FunkBG_"
 FILESUF="_8bar.SEQ"
 BPM_LIST=[]
-#BPM_LIST=["55","60"]
-#BPM_LIST+=["60","65","70","74","78","80","84"]
-#BPM_LIST+=["092","096"]
-#BPM_LIST+=["100","102","106","110"]
-BPM_LIST+=["088","088.1","089.2"]
+BPM_LIST=["055","060"]
+BPM_LIST+=["060","065","070","074","078","080","084"]
+BPM_LIST+=["092","096"]
+BPM_LIST+=["100","102","106","110"]
+#BPM_LIST+=["064","128","256"]
 #FIND="Funk2"+BPM
 FIND="88acTght"
 #REPL="FunkBG__"
@@ -59,14 +64,32 @@ for BPM in BPM_LIST:
       if chunknr==4:
         for idx,byte in enumerate(chunk):
            if idx == 4:
-             #print "bars: ", binascii.b2a_uu(byte)
-             print "bars: ", binascii.hexlify(byte)
+             #print "bars:", binascii.b2a_uu(byte)
+             print "bars:          ", binascii.hexlify(byte)
       if chunknr==3:
-        print "bpm i guess?: ", binascii.hexlify(chunk)
+        print "what's chunk 3:", binascii.hexlify(chunk)
       if chunknr==5:
-        print "bpm komma: ", binascii.hexlify(chunk)
+        tempo = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
+        print "bpm hex:       ", binascii.hexlify(chunk)
+        print "bpm dec:       ", tempo
+      #if chunk.find('Funk') != -1:
+      if chunknr==904:
+        print "WAV File P1:   ", chunk
+      if chunknr==906:
+        print "WAV File P2:   ", chunk
+      if chunknr==907:
+        print "WAV File Err:   ", chunk
+        
       chunknr=chunknr+1
   print ""
 
-
-
+#print "hex2dec: ", hex2dec("2c0101000a") 
+#print "hex2dec: ", hex2dec("002c0101") 
+#print '70 03 -> 88bpm'
+#print '7a 03 -> 89bpm'
+#text88='\x70\x03'
+#text89='\x7a\x03'
+#print '88 part1: ', binascii.hexlify(text88[0:1])
+#print '88 part2: ', binascii.hexlify(text88[1:2])
+#print '89 part1: ', binascii.hexlify(text89[0:1])
+#print '89 part2: ', binascii.hexlify(text89[1:2])

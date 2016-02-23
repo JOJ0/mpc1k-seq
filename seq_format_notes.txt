@@ -116,3 +116,22 @@ issues
 * 110 ?file
 
 ?file -> alles manuell auf mpc korrigiert und gespeichert, "kaputtes" file 110 aufgehoben
+
+
+
+### robert 
+robert: got it - es ist das in der zweiten Zeile
+[10:27am] robert: 0x05, 0x0A -- in 2 oder mehr bytes codiert, 0x0500 und 0x0A00 == 1280 / 2560, also immer bpm * 10
+[10:27am] pschwindt: flip: Feb 23 10:17:36 node2 lrmd[1488]:  notice: operation_finished: p_node-activate_stop_0:23623:stderr [ hetzner-node-activate.sh: don't know what to do on 'stop' ]
+[10:27am] pschwindt: Feb 23 10:17:36 node2 crmd[1491]:  notice: process_lrm_event: Operation p_node-activate_stop_0: unknown error (node=node2, call=95, rc=1, cib-update=28600, confirmed=true)
+[10:27am] pschwindt: exit 1 <- ist wohl der falsche Return Code
+[10:28am] robert: koennte jetzt noch codiert sein als 0x05 0x00, oder als 0x00 0x05, kommt darauf an, ob's little endian oder big endian ist
+[10:28am] robert: das kannst recht leicht sehen, wenn du die bpms auf 127 oder 255 setzt
+[10:29am] robert: dann kriegst an der Stelle im File entweder 0x09 0xF6 oder 0xF6 0x09
+[10:29am] robert: (fuer 255)
+robert: Tempo berechnen ist dann z.B., fuer text='\x09\xF6': tempo = ord(text[:1]) << 8 | ord(text[1:2])
+[10:33am] robert: falls es little endian ist, also text='\xF6\x09', halt einfach umdrehen, d.h. tempo = ord(text[1:2]) << 8 | ord(text[:1])
+
+
+robert: alright, ist little endian
+[10:35am] robert: muss man also umdrehen beim rechnen, 0x7a 0x03 == 0x037A == 890 => Tempo 89
