@@ -1,24 +1,26 @@
 #!/usr/bin/python
 import sys
+import os
 import string
 import pprint
 import subprocess
 import binascii
+import argparse
 
 def hex2dec(s):
   """return the integer value of a hexadecimal string s"""
   return int(s, 16)
 
-#if len(sys.argv) > 1:
-#  filename = sys.argv[1]
-#  print ("file used: " + str(filename))
-#else:
-#  print "please provide zip or csv file!"
-#  raise sys.exit() 
+parser = argparse.ArgumentParser()
+parser.add_argument("path", help="path of *.seq files to be processed")
+parser.add_argument("--replace", "-r", help="really replace ascii in seq file", action="store_true")
+args = parser.parse_args()
+if args.replace:
+  print "asciireplacer is enabled\n"
 
-# set default value here!!
-asciireplace="n"
-PATH="/Users/jojo/Music/klavier/0-MIDI & Audio Drums, Backing Tracks/drumloops_jojo/FunkBG1_SEQ/fertig und auf mpc/"
+PATH=args.path
+print "PATH used: " + PATH + "\n"
+
 # wav file name consisting of TWO 8 char strings, !not in a row!
 FILEPRE="FunkBG_"
 FILESUF="_8bar.SEQ"
@@ -32,56 +34,75 @@ BPM_LIST+=["100","102","106","110"]
 FIND="88acTght"
 #REPL="FunkBG__"
 REPL="acTgh" # BPM is added in for-loop below
-#asciireplace="y"
 
-for BPM in BPM_LIST:
-  BPMREPL=BPM+REPL
-  seqfile=PATH+FILEPRE+BPM+FILESUF
-  ## ASCIIREPLACER START ##
-  #print "file: "+FILEPRE+BPM+FILESUF+", find: "+FIND+", repl: "+BPMREPL
-  #shellhexdump = subprocess.Popen(['hexdump', '-C', seqfile], stdout=subprocess.PIPE)
-  #hexdumpout = shellhexdump.stdout.read()
-  #assert shellhexdump.wait() == 0
-  #print hexdumpout 
-  #search_line = hexdumpout.split("Funk")
-  #print search_line
-  #print ""
-  if asciireplace == "y":
-    print "now really replacing ascii data..."
-    #perl -pi -e 's/$ENV{FIND}/$ENV{REPL}/g' FunkBG_${BPM}_8bar.SEQ;
-  ## ASCIIREPLACER END ##
-  ##
-  ## SHOW/REPLACE binary data at specific byte ##
-  print "file: "+FILEPRE+BPM+FILESUF
-  bars=04
-  bpm=100.0
-  with open(seqfile, "rb") as f:
-    chunknr=1
-    while True:
-      chunk = f.read(8)
-      if not chunk:
-        break
-      if chunknr==4:
-        for idx,byte in enumerate(chunk):
-           if idx == 4:
-             #print "bars:", binascii.b2a_uu(byte)
-             print "bars:          ", binascii.hexlify(byte)
-      if chunknr==3:
-        print "what's chunk 3:", binascii.hexlify(chunk)
-      if chunknr==5:
-        tempo = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
-        print "bpm hex:       ", binascii.hexlify(chunk)
-        print "bpm dec:       ", tempo
-      #if chunk.find('Funk') != -1:
-      if chunknr==904:
-        print "WAV File P1:   ", chunk
-      if chunknr==906:
-        print "WAV File P2:   ", chunk
-      if chunknr==907:
-        print "WAV File Err:   ", chunk
-        
-      chunknr=chunknr+1
-  print ""
+#for BPM in BPM_LIST:
+for seqfile in os.listdir(PATH):
+  if ".SEQ" in seqfile:
+    #BPMREPL=BPM+REPL
+    #seqfile=PATH+FILEPRE+BPM+FILESUF
+
+    ## ASCIIREPLACER START ##
+    #print "file: "+FILEPRE+BPM+FILESUF+", find: "+FIND+", repl: "+BPMREPL
+    #shellhexdump = subprocess.Popen(['hexdump', '-C', seqfile], stdout=subprocess.PIPE)
+    #hexdumpout = shellhexdump.stdout.read()
+    #assert shellhexdump.wait() == 0
+    #print hexdumpout 
+    #search_line = hexdumpout.split("Funk")
+    #print search_line
+    #print ""
+    if args.replace:
+      print "now really replacing ascii data...\n"
+      #perl -pi -e 's/$ENV{FIND}/$ENV{REPL}/g' FunkBG_${BPM}_8bar.SEQ;
+    ## ASCIIREPLACER END ##
+    ##
+    ## SHOW/REPLACE binary data at specific byte ##
+    #print "file: "+FILEPRE+BPM+FILESUF
+    print "file: "+seqfile
+    #bars=04
+    #bpm=100.0
+    with open(PATH+"/"+seqfile, "rb") as f:
+      chunknr=1
+      while True:
+        chunk = f.read(8)
+        if not chunk:
+          break
+        if chunknr==4:
+          for idx,byte in enumerate(chunk):
+             if idx == 4:
+               #print "bars:", binascii.b2a_uu(byte)
+               print "bars:              ", binascii.hexlify(byte)
+        if chunknr==3:
+          print "what's chunk 3:    ", binascii.hexlify(chunk)
+        if chunknr==5:
+          tempo = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
+          print "bpm hex:           ", binascii.hexlify(chunk)
+          print "bpm dec:           ", tempo
+        #if chunk.find('Funk') != -1:
+        # Track 1
+        if chunknr==904:
+          print "WAV file Tr1 P1:   ", chunk
+        if chunknr==906:
+          print "WAV file Tr1 P2:   ", chunk
+        if chunknr==907:
+          print "WAV file Tr1 Err:  ", binascii.hexlify(chunk)
+        # Track 2
+        if chunknr==909:
+          print "WAV file Tr2 P1:   ", chunk
+        if chunknr==910:
+          print "WAV file Tr2 P2:   ", chunk
+        if chunknr==911:
+          print "WAV file Tr2 Err:  ", binascii.hexlify(chunk)
+
+        # DEBUG findstr
+        if "070bsD1" in chunk:
+          print "chunknr is ", chunknr
+          print "chunk is ", chunk
+        if "070drTgh" in chunk:
+          print "chunknr is ", chunknr
+          print "chunk is ", chunk
+
+        chunknr=chunknr+1
+    print ""
 
 #print "hex2dec: ", hex2dec("2c0101000a") 
 #print "hex2dec: ", hex2dec("002c0101") 
