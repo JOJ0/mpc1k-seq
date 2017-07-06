@@ -14,22 +14,26 @@ def hex2dec(s):
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.seq files to be processed")
 parser.add_argument("--replace", "-r", help="really replace ascii in seq file", action="store_true")
+#parser.add_argument("--bpm", "-b", help="space separated BPM list", type=str, nargs="*", dest="bpm_list")
+parser.add_argument("--bpm", "-b", help="space separated BPM list", type=str, dest="bpm_list")
 args = parser.parse_args()
+
+PATH=args.path
+print "\nPATH used: " + PATH + "\n"
+
 if args.replace:
   print "asciireplacer is enabled\n"
 
-PATH=args.path
-print "PATH used: " + PATH + "\n"
+if args.bpm_list:
+  print "bpm_list text:     ", args.bpm_list
+  bpm_list = args.bpm_list.split(' ')
+  print "bpm_list list:     ",  bpm_list , "\n"
+
 
 # wav file name consisting of TWO 8 char strings, !not in a row!
 FILEPRE="FunkBG_"
 FILESUF="_8bar.SEQ"
-BPM_LIST=[]
-BPM_LIST=["055","060"]
-BPM_LIST+=["060","065","070","074","078","080","084"]
-BPM_LIST+=["092","096"]
-BPM_LIST+=["100","102","106","110"]
-#BPM_LIST+=["064","128","256"]
+BPM_LIST=["100","102","106","110"]
 #FIND="Funk2"+BPM
 FIND="88acTght"
 #REPL="FunkBG__"
@@ -37,7 +41,7 @@ REPL="acTgh" # BPM is added in for-loop below
 
 #for BPM in BPM_LIST:
 for seqfile in os.listdir(PATH):
-  if ".SEQ" in seqfile:
+  if (".SEQ" in seqfile and args.bpm_list is None) or (".SEQ" in seqfile and any(bpm in seqfile for bpm in bpm_list)):
     #BPMREPL=BPM+REPL
     #seqfile=PATH+FILEPRE+BPM+FILESUF
 
@@ -57,7 +61,7 @@ for seqfile in os.listdir(PATH):
     ##
     ## SHOW/REPLACE binary data at specific byte ##
     #print "file: "+FILEPRE+BPM+FILESUF
-    print "file: "+seqfile
+    print "file:               "+seqfile
     #bars=04
     #bpm=100.0
     with open(PATH+"/"+seqfile, "rb") as f:
@@ -67,39 +71,43 @@ for seqfile in os.listdir(PATH):
         if not chunk:
           break
         if chunknr==4:
+          print "bars HEX:          ", binascii.hexlify(chunk)
           for idx,byte in enumerate(chunk):
              if idx == 4:
-               #print "bars:", binascii.b2a_uu(byte)
-               print "bars:              ", binascii.hexlify(byte)
-        if chunknr==3:
-          print "what's chunk 3:    ", binascii.hexlify(chunk)
+               #print "bars ???:          ", binascii.b2a_uu(byte)
+               print "bars DEC:          ", binascii.hexlify(byte)
+        #if chunknr==3:
+        #  print "what's chunk 3:    ", binascii.hexlify(chunk)
         if chunknr==5:
           tempo = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
-          print "bpm hex:           ", binascii.hexlify(chunk)
-          print "bpm dec:           ", tempo
+          print "bpm HEX:           ", binascii.hexlify(chunk)
+          print "bpm DEC:           ", tempo
         #if chunk.find('Funk') != -1:
+        # in file FunkBG__096ac8ba.SEQ chunk 902 is 2nd part of WAV name!?!
+        #if chunknr==902:
+        #  print "chunk 902:   ", chunk
         # Track 1
         if chunknr==904:
           print "WAV file Tr1 P1:   ", chunk
         if chunknr==906:
           print "WAV file Tr1 P2:   ", chunk
-        if chunknr==907:
-          print "WAV file Tr1 Err:  ", binascii.hexlify(chunk)
+        #if chunknr==907:
+        #  print "WAV file Tr1 Err:  ", binascii.hexlify(chunk)
         # Track 2
-        if chunknr==909:
-          print "WAV file Tr2 P1:   ", chunk
-        if chunknr==910:
-          print "WAV file Tr2 P2:   ", chunk
-        if chunknr==911:
-          print "WAV file Tr2 Err:  ", binascii.hexlify(chunk)
+        #if chunknr==909:
+        #  print "WAV file Tr2 P1:   ", chunk
+        #if chunknr==910:
+        #  print "WAV file Tr2 P2:   ", chunk
+        #if chunknr==911:
+        #  print "WAV file Tr2 Err:  ", binascii.hexlify(chunk)
 
         # DEBUG findstr
-        if "070bsD1" in chunk:
-          print "chunknr is ", chunknr
-          print "chunk is ", chunk
-        if "070drTgh" in chunk:
-          print "chunknr is ", chunknr
-          print "chunk is ", chunk
+        #if "070bsD1" in chunk:
+        #  print "chunknr is ", chunknr
+        #  print "chunk is ", chunk
+        #if "070drTgh" in chunk:
+        #  print "chunknr is ", chunknr
+        #  print "chunk is ", chunk
 
         chunknr=chunknr+1
     print ""
