@@ -65,40 +65,40 @@ for seqfile in os.listdir(PATH):
     #bars=04
     #bpm=100.0
     with open(PATH+"/"+seqfile, "rb") as f:
-      chunknr=1
+      chunknr=0
       while True:
         chunk = f.read(8)
         if not chunk:
           break
-        if chunknr==4:
+        if chunknr==3:
           print "bars HEX:          ", binascii.hexlify(chunk)
           for idx,byte in enumerate(chunk):
              if idx == 4:
                #print "bars ???:          ", binascii.b2a_uu(byte)
                print "bars DEC:          ", binascii.hexlify(byte)
-        #if chunknr==3:
-        #  print "what's chunk 3:    ", binascii.hexlify(chunk)
-        if chunknr==5:
+        #if chunknr==2:
+        #  print "what's chunk 2:    ", binascii.hexlify(chunk)
+        if chunknr==4:
           tempo = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
           print "bpm HEX:           ", binascii.hexlify(chunk)
           print "bpm DEC:           ", tempo
         #if chunk.find('Funk') != -1:
-        # in file FunkBG__096ac8ba.SEQ chunk 902 is 2nd part of WAV name!?!
-        #if chunknr==902:
-        #  print "chunk 902:   ", chunk
+        # in file FunkBG__096ac8ba.SEQ chunk 901 is 2nd part of WAV name!?!
+        #if chunknr==901:
+        #  print "chunk 901:   ", chunk
         # Track 1
-        if chunknr==904:
+        if chunknr==903:
           print "WAV file Tr1 P1:   ", chunk
-        if chunknr==906:
+        if chunknr==905:
           print "WAV file Tr1 P2:   ", chunk
-        #if chunknr==907:
+        #if chunknr==906:
         #  print "WAV file Tr1 Err:  ", binascii.hexlify(chunk)
         # Track 2
-        #if chunknr==909:
+        #if chunknr==908:
         #  print "WAV file Tr2 P1:   ", chunk
-        #if chunknr==910:
+        #if chunknr==909:
         #  print "WAV file Tr2 P2:   ", chunk
-        #if chunknr==911:
+        #if chunknr==910:
         #  print "WAV file Tr2 Err:  ", binascii.hexlify(chunk)
 
         # DEBUG findstr
