@@ -25,9 +25,9 @@ if args.replace:
   print "asciireplacer is enabled\n"
 
 if args.bpm_list:
-  print "bpm_list text:\t", args.bpm_list
+  #print "bpm_list text:\t", args.bpm_list
   bpm_list = args.bpm_list.split(' ')
-  print "bpm_list list:\t",  bpm_list , "\n"
+  print "bpm_list:\t",  bpm_list , "\n"
 
 
 # wav file name consisting of TWO 8 char strings, !not in a row!
@@ -71,11 +71,22 @@ for seqfile in os.listdir(PATH):
         if not chunk:
           break
         if chunknr==3:
-          print hex(chunknr*8), "\tbars HEX:\t\t", binascii.hexlify(chunk)
+          chunk_bytes=""
           for idx,byte in enumerate(chunk):
+             #print binascii.hexlify(byte)
+             if idx == 0:
+               #print binascii.hexlify(byte)
+               chunk_bytes=binascii.hexlify(byte)
+             elif idx % 2:
+               chunk_bytes=chunk_bytes+""+binascii.hexlify(byte)
+             else:
+               chunk_bytes=chunk_bytes+" "+binascii.hexlify(byte)
+             # always do this
              if idx == 4:
                #print hex(chunknr*8), "\tbars ???:          ", binascii.b2a_uu(byte)
                print hex(chunknr*8), "\tbars DEC:\t\t", binascii.hexlify(byte)
+          print hex(chunknr*8), "\tchunk 3 (bars, ):\t", chunk_bytes
+          #print hex(chunknr*8), "\tbars HEX:\t\t", binascii.hexlify(chunk)
         #if chunknr==2:
         #  print hex(chunknr*8), "what's chunk 2:\t", binascii.hexlify(chunk)
         if chunknr==4:
