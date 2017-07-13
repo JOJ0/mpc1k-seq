@@ -11,6 +11,24 @@ def hex2dec(s):
   """return the integer value of a hexadecimal string s"""
   return int(s, 16)
 
+def chunk2hexgroups(chunk):
+  """return 2-byte-groups of binary chunk"""
+  hexchunk=binascii.hexlify(chunk)
+  #return  hexchunk
+  #hexchunk2byte=hexchunk[0:4]+" "+hexchunk[4:8]+" "+hexchunk[8:12]+" "+hexchunk[12:16]+" "
+  #return len(hexchunk), "\n"
+  hexgroups=[hexchunk[i:i+4] for i in range (0, len(hexchunk), 4)]
+  hexgroups_str=""
+  for idx,group in enumerate(hexgroups):
+    if idx==0: hexgroups_str=str(group)
+    else: hexgroups_str=hexgroups_str+" "+str(group)
+  return hexgroups_str
+
+def chunk2bytearray(chunk):
+  """return list containing bytes of chunk"""
+  bytearray=[chunk[i:i+1] for i in range (0, len(chunk), 1)]
+  return bytearray
+
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.seq files to be processed")
 parser.add_argument("--replace", "-r", help="really replace ascii in seq file", action="store_true")
@@ -67,31 +85,35 @@ for seqfile in os.listdir(PATH):
     with open(PATH+"/"+seqfile, "rb") as f:
       chunknr=0
       while True:
-        chunk = f.read(8)
+        chunk = f.read(8) # each chunk is 8 bytes of binary data (\x00\x01...)
         if not chunk:
           break
+        if chunknr==2:
+          print hex(chunknr*8),"\twhat's chunk 2?\t\t", chunk2hexgroups(chunk)
         if chunknr==3:
-          chunk_bytes=""
-          for idx,byte in enumerate(chunk):
-             #print binascii.hexlify(byte)
-             if idx == 0:
-               #print binascii.hexlify(byte)
-               chunk_bytes=binascii.hexlify(byte)
-             elif idx % 2:
-               chunk_bytes=chunk_bytes+""+binascii.hexlify(byte)
-             else:
-               chunk_bytes=chunk_bytes+" "+binascii.hexlify(byte)
-             # always do this
-             if idx == 4:
-               #print hex(chunknr*8), "\tbars ???:          ", binascii.b2a_uu(byte)
-               print hex(chunknr*8), "\tbars DEC:\t\t", binascii.hexlify(byte)
-          print hex(chunknr*8), "\tchunk 3 (bars, ):\t", chunk_bytes
-          #print hex(chunknr*8), "\tbars HEX:\t\t", binascii.hexlify(chunk)
-        #if chunknr==2:
-        #  print hex(chunknr*8), "what's chunk 2:\t", binascii.hexlify(chunk)
+          #chunk_bytes=""
+          #for idx,byte in enumerate(chunk):
+          #   #print binascii.hexlify(byte)
+          #   if idx == 0:
+          #     #print binascii.hexlify(byte)
+          #     chunk_bytes=binascii.hexlify(byte)
+          #   elif idx % 2:
+          #     chunk_bytes=chunk_bytes+""+binascii.hexlify(byte)
+          #   else:
+          #     chunk_bytes=chunk_bytes+" "+binascii.hexlify(byte)
+          #   # always do this
+          #   if idx == 4:
+          #     #print hex(chunknr*8), "\tbars ???:          ", binascii.b2a_uu(byte)
+          #     print hex(chunknr*8), "\tbars DEC:\t\t", binascii.hexlify(byte)
+          print hex(chunknr*8), "\tbars (and ?) HEX:\t", chunk2hexgroups(chunk)
+          #print hex(chunknr*8), "\tbars (and ?) HEX:\t", chunk2bytearray(chunk)
+          print hex(chunknr*8), "\tbars HEX:\t\t", chunk2hexgroups(chunk[4:8])
+          bars = binascii.hexlify(chunk[4:8])
+          #bars = ord(chunk[1:2]) << 8 
+          print hex(chunknr*8), "\tbars DEC:\t\t", hex2dec(bars) 
         if chunknr==4:
+          print hex(chunknr*8), "\tbpm HEX:\t\t", chunk2hexgroups(chunk)
           tempo = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
-          print hex(chunknr*8), "\tbpm HEX:\t\t", binascii.hexlify(chunk)
           print hex(chunknr*8), "\tbpm DEC:\t\t", tempo
         #if chunk.find('Funk') != -1:
         # in file FunkBG__096ac8ba.SEQ chunk 901 is 2nd part of WAV name!?!
