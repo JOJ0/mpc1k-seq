@@ -91,30 +91,18 @@ for seqfile in os.listdir(PATH):
         if chunknr==2:
           print hex(chunknr*8),"\twhat's chunk 2?\t\t", chunk2hexgroups(chunk)
         if chunknr==3:
-          #chunk_bytes=""
-          #for idx,byte in enumerate(chunk):
-          #   #print binascii.hexlify(byte)
-          #   if idx == 0:
-          #     #print binascii.hexlify(byte)
-          #     chunk_bytes=binascii.hexlify(byte)
-          #   elif idx % 2:
-          #     chunk_bytes=chunk_bytes+""+binascii.hexlify(byte)
-          #   else:
-          #     chunk_bytes=chunk_bytes+" "+binascii.hexlify(byte)
-          #   # always do this
-          #   if idx == 4:
-          #     #print hex(chunknr*8), "\tbars ???:          ", binascii.b2a_uu(byte)
-          #     print hex(chunknr*8), "\tbars DEC:\t\t", binascii.hexlify(byte)
           print hex(chunknr*8), "\tbars (and ?) HEX:\t", chunk2hexgroups(chunk)
-          #print hex(chunknr*8), "\tbars (and ?) HEX:\t", chunk2bytearray(chunk)
-          print hex(chunknr*8), "\tbars HEX:\t\t", chunk2hexgroups(chunk[4:8])
-          bars = binascii.hexlify(chunk[4:8])
+          #print hex(chunknr*8), "\tbars HEX reord:\t\t", chunk2hexgroups(chunk[6:7]+chunk[4:5])
+          bars = hex2dec(binascii.hexlify(chunk[6:7]+chunk[4:5]))
           #bars = ord(chunk[1:2]) << 8 
-          print hex(chunknr*8), "\tbars DEC:\t\t", hex2dec(bars) 
+          print hex(chunknr*8), "\tbars DEC:\t\t", bars 
         if chunknr==4:
           print hex(chunknr*8), "\tbpm HEX:\t\t", chunk2hexgroups(chunk)
-          tempo = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
-          print hex(chunknr*8), "\tbpm DEC:\t\t", tempo
+          #tempo_rob = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
+          #print hex(chunknr*8), "\tbpm DEC Robert:\t\t", tempo_rob
+          #tempo_my_reord = chunk2bytearray(chunk)[1:2]+chunk2bytearray(chunk)[0:1]
+          tempo_my = hex2dec(binascii.hexlify(chunk[1:2]+chunk[0:1])) / 10
+          print hex(chunknr*8), "\tbpm DEC:\t\t", tempo_my
         #if chunk.find('Funk') != -1:
         # in file FunkBG__096ac8ba.SEQ chunk 901 is 2nd part of WAV name!?!
         #if chunknr==901:
