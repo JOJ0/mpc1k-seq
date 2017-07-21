@@ -86,7 +86,7 @@ for seqfile in os.listdir(PATH):
     ##
     ## SHOW/REPLACE binary data at specific byte ##
     #print "file: "+FILEPRE+BPM+FILESUF
-    print "file:\t\t\t\t"+seqfile
+    print "############### "+seqfile+" ################"
     #bars=04
     #bpm=100.0
     with open(PATH+"/"+seqfile, "rb") as f:
@@ -100,7 +100,7 @@ for seqfile in os.listdir(PATH):
         #print '0x%04x' % bytenr # DEBUG OUT ALL HEX CHUNK NUMBERS
         #print bytehex # DEBUG OUT ALL HEX CHUNK NUMBERS
         if chunknr==0:
-          print bytehex,"\theader 1:\t\t", chunk
+          print bytehex,"\theader 1:\t\t", chunk[1:]
         if chunknr==1:
           print bytehex,"\theader 2:\t\t", chunk
         if chunknr==2:
@@ -128,20 +128,26 @@ for seqfile in os.listdir(PATH):
           print bytehex, "\tWAV file Tr1 P1:\t", chunk
         if chunknr==905:
           print bytehex, "\tWAV file Tr1 P2:\t", chunk
-        #if chunknr==906:
-        #  print bytehex, "\tWAV file Tr1 Err:\t\t", binascii.hexlify(chunk)
+        if chunknr==906:
+          print bytehex, "\tWAV file Tr1 bound.?\t", binascii.hexlify(chunk)
         # Track 2
-        #if chunknr==908:
-        #  print bytehex, "\tWAV file Tr2 P1:\t", chunk
-        #if chunknr==909:
-        #  print bytehex, "\tWAV file Tr2 P2:\t", chunk
-        #if chunknr==910:
-        #  print bytehex, "\tWAV file Tr2 Err:\t", binascii.hexlify(chunk)
+        if chunknr==908:
+          print bytehex, "\tWAV file Tr2 P1:\t", chunk
+        if chunknr==909:
+          print bytehex, "\tWAV file Tr2 P2:\t", chunk
+        if chunknr==910:
+          print bytehex, "\tWAV file Tr2 bound.?\t", binascii.hexlify(chunk)
+        if chunknr==899:
+          print bytehex, "\ttest:\t", chunk
+        if chunknr==900:
+          print bytehex, "\ttest:\t", chunk
+        if chunknr==901:
+          print bytehex, "\ttest:\t", chunk
 
         # DEBUG findstr
-        #if "070bsD1" in chunk:
-        #  print "chunknr is ", chunknr
-        #  print "chunk is ", chunk
+        if "75_" in chunk:
+          print "chunknr is ", chunknr
+          print "chunk is ", chunk
         #if "070drTgh" in chunk:
         #  print "chunknr is ", chunknr
         #  print "chunk is ", chunk
