@@ -8,6 +8,11 @@ import binascii
 import argparse
 import struct
 
+bytedec_begin=0
+bytehex_beg=0x0
+bytedec_end=0
+bytehex_end=0x0
+
 def hex2dec(s):
   """return the integer value of a hexadecimal string s"""
   return int(s, 16)
@@ -34,6 +39,23 @@ def chunk2bytearray(chunk):
   bytearray=[chunk[i:i+1] for i in range (0, len(chunk), 1)]
   return bytearray
 
+def read_and_tell(to_byte):
+  """read up to specific byte number, set bytedec+bytehex to current position"""
+  global bytedec_begin, bytehex_beg, bytedec_end, bytehex_end
+  chunk = f.read(to_byte)
+  bytedec_end=f.tell()
+  bytehex_end="{0:#0{1}x}".format(bytedec_end,6)
+  bytedec_begin = bytedec_end - to_byte
+  bytehex_beg="{0:#0{1}x}".format(bytedec_begin,6)
+  return chunk
+
+def print_chunk(chunk, data,  descr, hexflag=0):
+  """print properly formated chunk data"""
+  global bytedec_begin, bytehex_beg, bytedec_end, bytehex_end, chunk2hexgroups
+  hexgroup=""
+  if hexflag==1: hexgroup="| "+chunk2hexgroups(chunk)+" |"
+  return str(bytehex_beg)+"\t"+descr+str(data[0])+"\t"+hexgroup
+
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.seq files to be processed")
 parser.add_argument("--replace", "-r", help="really replace ascii in seq file", action="store_true")
@@ -56,43 +78,75 @@ for seqfile in os.listdir(PATH):
       print "now really replacing ascii data...\n"
     print "############### "+seqfile+" ################"
     with open(PATH+"/"+seqfile, "rb") as f:
-      chunknr=0
       #while True:
-      header_chunk = f.read(47) # read up to end of header 0x002f
-      if not header_chunk:
-        break
-      bytedec=chunknr*8
-      bytehex="{0:#0{1}x}".format(bytedec,6)
+      #chunk = f.read(47) # read up to end of header 0x002f
+      #chunk = f.read(4) # read first 4
+      #if not chunk:
+      #  break
       seqheader={}
-      # try something like this to save header data:
-      seqheader['first4']=struct.unpack("<I",header_chunk[0:4])
-      seqheader['version']=struct.unpack("16s",header_chunk[4:20])
+      chunk = read_and_tell(2) # read next bytes
+      seqheader['some_number01']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['some_number01'], "first 2 bytes\t\t", 1)
+      #
+      chunk = read_and_tell(2) # read next bytes
+      seqheader['some_number02']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['some_number02'], "next 2 bytes\t\t", 1)
+      #
+      chunk = read_and_tell(16) # read next bytes
+      seqheader['version']=struct.unpack("16s",chunk)
+      print print_chunk(chunk, seqheader['version'], "version:\t\t", 0)
+      #
+      chunk = read_and_tell(2) # read next bytes
+      seqheader['some_number03']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['some_number03'], "some short:\t\t", 1)
+      #
+      chunk = read_and_tell(2) # read next bytes
+      seqheader['some_number04']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['some_number04'], "some short:\t\t", 1)
+      #
+      chunk = read_and_tell(2) # read next bytes
+      seqheader['some_number05']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['some_number05'], "some short:\t\t", 1)
+      #
+      chunk = read_and_tell(2) # read next bytes
+      seqheader['some_number06']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['some_number06'], "some short:\t\t", 1)
+      #
+      chunk = read_and_tell(2) # read next bytes
+      seqheader['bars']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", 1)
+      #
+      chunk = read_and_tell(2)
+      seqheader['some_number07']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['some_number07'], "some short:\t\t", 1)
+      #
+      chunk = read_and_tell(4)
+      seqheader['bpm']=struct.unpack("<I",chunk)
+      seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divde by 10 and create a tuple again
+      print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", 1)
+      #
+      chunk = read_and_tell(8)
+      seqheader['some_number08']=struct.unpack("<Q",chunk) # unsinged long long
+      #print seqheader['some_number08']
+      print print_chunk(chunk, seqheader['some_number08'], "some zeroes:\t\t", 1)
+      #
+      chunk = read_and_tell(4)
+      seqheader['some_number09']=struct.unpack("<I",chunk)
+      print print_chunk(chunk, seqheader['some_number09'], "some zeroes:\t\t", 1)
+      #
+      chunk = read_and_tell(2)
+      seqheader['tempo_map01']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['tempo_map01'], "tempo map 01:\t\t", 1)
+      #
+      chunk = read_and_tell(2)
+      seqheader['tempo_map02']=struct.unpack("<H",chunk)
+      print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", 1)
+      #
       #seqheader['fileversion']=struct.unpack('B',didson_data[3:4])[0]
       #seqheader['numframes']=struct.unpack('l',didson_data[4:8])
       #print '0x%04x' % bytenr # DEBUG OUT ALL HEX CHUNK NUMBERS
       #print bytehex # DEBUG OUT ALL HEX CHUNK NUMBERS
-      print bytehex,"\tfirst 4 bytes:\t\t", str(seqheader['first4'])
-      print bytehex,"\tversion:\t\t", seqheader['version']
-      #if chunknr==0:
-      #  print bytehex,"\theader 1:\t\t", chunk[1:]
-      #if chunknr==1:
-      #  print bytehex,"\theader 2:\t\t", chunk
-      #if chunknr==2:
-      #  print bytehex, "\theader 3:\t\t", chunk
-      #if chunknr==3:
-      #  print bytehex, "\tsome ints and bars HEX:\t", chunk2hexgroups(chunk)
-      #  someint1 = little2dec(chunk[0:1], chunk[1:2])
-      #  someint2 = little2dec(chunk[2:3], chunk[3:4])
-      #  print bytehex, "\tsome ints:\t\t", someint1, " ", someint2  
-      #  bars = little2dec(chunk[4:5], chunk[6:7]) 
-      #  print bytehex, "\tbars DEC:\t\t", bars 
-      #if chunknr==4:
-      #  print bytehex, "\tbpm HEX:\t\t", chunk2hexgroups(chunk)
-      #  #tempo_rob = (ord(chunk[1:2]) << 8 | ord(chunk[:1])) / 10
-      #  #print bytehex, "\tbpm DEC Robert:\t\t", tempo_rob
-      #  #tempo_my_reord = chunk2bytearray(chunk)[1:2]+chunk2bytearray(chunk)[0:1]
-      #  tempo_my = little2dec(chunk[0:1], chunk[1:2]) / 10
-      #  print bytehex, "\tbpm DEC:\t\t", tempo_my
+      #
       ##if chunk.find('Funk') != -1:
       ## in file FunkBG__096ac8ba.SEQ chunk 901 is 2nd part of WAV name!?!
       ##if chunknr==901:
@@ -168,5 +222,4 @@ for seqfile in os.listdir(PATH):
 
 
       #print hex(chunknr)
-      chunknr=chunknr+1
     print ""
