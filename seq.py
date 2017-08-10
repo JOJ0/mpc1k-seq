@@ -52,9 +52,11 @@ def read_and_tell(to_byte):
 def print_chunk(chunk, data,  descr, hexflag=0):
   """print properly formated chunk data"""
   global bytedec_begin, bytehex_beg, bytedec_end, bytehex_end, chunk2hexgroups
+  data_list=""
+  data_list=" ".join(map(str,data))
   hexgroup=""
   if hexflag==1: hexgroup="| "+chunk2hexgroups(chunk)+" |"
-  return str(bytehex_beg)+"\t"+descr+str(data[0])+"\t"+hexgroup
+  return bytehex_beg+"\t"+descr+data_list+"\t"+hexgroup
 
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.seq files to be processed")
@@ -90,56 +92,52 @@ for seqfile in os.listdir(PATH):
       #
       chunk = read_and_tell(2) # read next bytes
       seqheader['some_number02']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number02'], "next 2 bytes\t\t", 1)
+      print print_chunk(chunk, seqheader['some_number02'], "zero:\t\t\t", 1)
       #
       chunk = read_and_tell(16) # read next bytes
       seqheader['version']=struct.unpack("16s",chunk)
       print print_chunk(chunk, seqheader['version'], "version:\t\t", 0)
       #
-      chunk = read_and_tell(2) # read next bytes
-      seqheader['some_number03']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number03'], "some short:\t\t", 1)
+      chunk = read_and_tell(8) # read next bytes
+      seqheader['some_number03']=struct.unpack("<4H",chunk)
+      print print_chunk(chunk, seqheader['some_number03'], "some shorts:\t\t", 1)
       #
-      chunk = read_and_tell(2) # read next bytes
-      seqheader['some_number04']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number04'], "some short:\t\t", 1)
-      #
-      chunk = read_and_tell(2) # read next bytes
-      seqheader['some_number05']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number05'], "some short:\t\t", 1)
-      #
-      chunk = read_and_tell(2) # read next bytes
-      seqheader['some_number06']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number06'], "some short:\t\t", 1)
-      #
+      #chunk = read_and_tell(2) # read next bytes
+      #seqheader['some_number04']=struct.unpack("<H",chunk)
+      #print print_chunk(chunk, seqheader['some_number04'], "some short:\t\t", 1)
+      ##
+      #chunk = read_and_tell(2) # read next bytes
+      #seqheader['some_number05']=struct.unpack("<H",chunk)
+      #print print_chunk(chunk, seqheader['some_number05'], "some short:\t\t", 1)
+      ##
+      #chunk = read_and_tell(2) # read next bytes
+      #seqheader['some_number06']=struct.unpack("<H",chunk)
+      #print print_chunk(chunk, seqheader['some_number06'], "some short:\t\t", 1)
+      ##
       chunk = read_and_tell(2) # read next bytes
       seqheader['bars']=struct.unpack("<H",chunk)
       print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", 1)
       #
       chunk = read_and_tell(2)
       seqheader['some_number07']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number07'], "some short:\t\t", 1)
+      print print_chunk(chunk, seqheader['some_number07'], "zero:\t\t\t", 1)
       #
-      chunk = read_and_tell(4)
-      seqheader['bpm']=struct.unpack("<I",chunk)
+      chunk = read_and_tell(2)
+      seqheader['bpm']=struct.unpack("<H",chunk)
       seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divde by 10 and create a tuple again
       print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", 1)
       #
-      chunk = read_and_tell(8)
-      seqheader['some_number08']=struct.unpack("<Q",chunk) # unsinged long long
+      chunk = read_and_tell(14)
+      seqheader['some_number08']=struct.unpack("<7H",chunk) # 3 ints
       #print seqheader['some_number08']
       print print_chunk(chunk, seqheader['some_number08'], "some zeroes:\t\t", 1)
       #
       chunk = read_and_tell(4)
-      seqheader['some_number09']=struct.unpack("<I",chunk)
-      print print_chunk(chunk, seqheader['some_number09'], "some zeroes:\t\t", 1)
-      #
-      chunk = read_and_tell(2)
-      seqheader['tempo_map01']=struct.unpack("<H",chunk)
+      seqheader['tempo_map01']=struct.unpack("<2H",chunk)
       print print_chunk(chunk, seqheader['tempo_map01'], "tempo map 01:\t\t", 1)
       #
-      chunk = read_and_tell(2)
-      seqheader['tempo_map02']=struct.unpack("<H",chunk)
+      chunk = read_and_tell(4)
+      seqheader['tempo_map02']=struct.unpack("<2H",chunk)
       print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", 1)
       #
       #seqheader['fileversion']=struct.unpack('B',didson_data[3:4])[0]
