@@ -41,6 +41,7 @@ def chunk2bytearray(chunk):
 
 def read_and_tell(to_byte):
   """read up to specific byte number, set bytedec+bytehex to current position"""
+  """the file objects name is hardcoded *grauslich*"""
   global bytedec_beg, bytehex_beg, bytedec_end, bytehex_end
   chunk = f.read(to_byte)
   bytedec_end=f.tell()
@@ -89,6 +90,7 @@ for seqfile in os.listdir(PATH):
       #chunk = f.read(4) # read first 4
       #if not chunk:
       #  break
+      # header data will be written into this dictionary
       seqheader={}
       chunk = read_and_tell(2) # read next bytes
       seqheader['some_number01']=struct.unpack("<H",chunk)
@@ -143,6 +145,16 @@ for seqfile in os.listdir(PATH):
       chunk = read_and_tell(4)
       seqheader['tempo_map02']=struct.unpack("<2H",chunk)
       print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
+      #
+      # read to end of file and store in ordinary var
+      #rest_of_file = read_and_tell(0)
+      rest_of_file = f.read()
+      #seqheader['rest_of_file']=struct.unpack("<2H",chunk)
+      #print print_chunk(chunk, seqheader['rest_of_file'], "rest of file:\t\t", args.hex)
+      # debug print binary
+      #print print_chunk(chunk, chunk, "rest of file:\t\t", args.hex)
+
+      # keeping old version and other stuff for reference here:
       #
       #seqheader['fileversion']=struct.unpack('B',didson_data[3:4])[0]
       #seqheader['numframes']=struct.unpack('l',didson_data[4:8])
