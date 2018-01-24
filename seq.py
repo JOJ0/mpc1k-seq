@@ -61,6 +61,7 @@ def print_chunk(chunk, data,  descr, hexflag=0):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.seq files to be processed")
+parser.add_argument("--search", "-s", help="search for given string in file contents, show in output when found", type=str, dest="searchterm")
 parser.add_argument("--replace", "-r", help="really replace ascii in seq file", action="store_true")
 parser.add_argument("--bpm", "-b", help="space separated BPM list (actually any string in filename will be searched for", type=str, dest="bpm_list")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
@@ -146,6 +147,7 @@ for seqfile in os.listdir(PATH):
       seqheader['tempo_map02']=struct.unpack("<2H",chunk)
       print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
       #
+      print "############### End of Header ###############"
       # read to end of file and store in ordinary var
       #rest_of_file = read_and_tell(0)
       rest_of_file = f.read()
@@ -153,6 +155,20 @@ for seqfile in os.listdir(PATH):
       #print print_chunk(chunk, seqheader['rest_of_file'], "rest of file:\t\t", args.hex)
       # debug print binary
       #print print_chunk(chunk, chunk, "rest of file:\t\t", args.hex)
+      # search for string in rest of file
+      #if "blues" in rest_of_file:
+      #  print "found Blues"
+      if args.searchterm:
+        length=len(args.searchterm)
+        index = rest_of_file.find(args.searchterm)
+        if index != -1:
+          print "Found your searchterm at index "+str(index)+", it's "+str(length)+" characters long"
+          print "If your searchterm is the START of a filename in an Audio Track,"
+          print "this would be the first half of the filename:\t"+rest_of_file[index:index+8]
+          print "and this would be the second half:\t\t"+rest_of_file[index+8+8:index+8+8+8]
+          print "(max chars in filename total is 16)"
+          print "run script again with --replace 'replaceterm' to replace 'searchterm'"
+          print "If this all looks like crap, don't do it!"
 
       # keeping old version and other stuff for reference here:
       #
