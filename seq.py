@@ -170,6 +170,10 @@ for seqfile in os.listdir(PATH):
           print "run script again with --replace 'replaceterm' to replace 'searchterm'"
           print "If this all looks like crap, don't do it!"
 
+      # test struct pack
+      if args.replace
+        bytestring=struct.pack("< 2 H",seqheader['bpm'])
+        binascii.hexlify(bytestring)
       # keeping old version and other stuff for reference here:
       #
       #seqheader['fileversion']=struct.unpack('B',didson_data[3:4])[0]
