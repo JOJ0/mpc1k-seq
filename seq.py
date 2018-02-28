@@ -169,11 +169,15 @@ for seqfile in os.listdir(PATH):
           print "(max chars in filename total is 16)"
           print "run script again with --replace 'replaceterm' to replace 'searchterm'"
           print "If this all looks like crap, don't do it!"
+          print ""
 
       # test struct pack
-      if args.replace
-        bytestring=struct.pack("< 2 H",seqheader['bpm'])
-        binascii.hexlify(bytestring)
+      if args.replace:
+        print(map(str,seqheader['tempo_map02']))
+        print type(seqheader['tempo_map02'])
+        bytestring=struct.pack("<2H", *seqheader['tempo_map02'])
+        #bytestring=struct.pack("<1H", *seqheader['bars'])
+        print binascii.hexlify(bytestring)
       # keeping old version and other stuff for reference here:
       #
       #seqheader['fileversion']=struct.unpack('B',didson_data[3:4])[0]
