@@ -71,7 +71,7 @@ PATH=args.path
 print "\nPATH used:\t" + PATH + "\n"
 
 if args.replace:
-  print "asciireplacer is enabled\n"
+  print "asciireplacer is enabled - well, currently not really - in development\n"
 
 if args.hex:
   print "show hex values is enabled\n"
@@ -82,8 +82,6 @@ if args.bpm_list:
 
 for seqfile in os.listdir(PATH):
   if (".SEQ" in seqfile and args.bpm_list is None) or (".SEQ" in seqfile and any(bpm in seqfile for bpm in bpm_list)):
-    if args.replace:
-      print "now really replacing ascii data...\n"
     print "############### "+seqfile+" ################"
     with open(PATH+"/"+seqfile, "rb") as f:
       #while True:
@@ -91,7 +89,8 @@ for seqfile in os.listdir(PATH):
       #chunk = f.read(4) # read first 4
       #if not chunk:
       #  break
-      # header data will be written into this dictionary
+      # header data will be written into this dictionary,
+      # each element read from struct.unpack is a tuple!
       seqheader={}
       chunk = read_and_tell(2) # read next bytes
       seqheader['some_number01']=struct.unpack("<H",chunk)
@@ -109,18 +108,6 @@ for seqfile in os.listdir(PATH):
       seqheader['some_number03']=struct.unpack("<4H",chunk)
       print print_chunk(chunk, seqheader['some_number03'], "some shorts:\t\t", args.hex)
       #
-      #chunk = read_and_tell(2) # read next bytes
-      #seqheader['some_number04']=struct.unpack("<H",chunk)
-      #print print_chunk(chunk, seqheader['some_number04'], "some short:\t\t", args.hex)
-      ##
-      #chunk = read_and_tell(2) # read next bytes
-      #seqheader['some_number05']=struct.unpack("<H",chunk)
-      #print print_chunk(chunk, seqheader['some_number05'], "some short:\t\t", args.hex)
-      ##
-      #chunk = read_and_tell(2) # read next bytes
-      #seqheader['some_number06']=struct.unpack("<H",chunk)
-      #print print_chunk(chunk, seqheader['some_number06'], "some short:\t\t", args.hex)
-      ##
       chunk = read_and_tell(2) # read next bytes
       seqheader['bars']=struct.unpack("<H",chunk)
       print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", args.hex)
@@ -136,7 +123,7 @@ for seqfile in os.listdir(PATH):
       #
       chunk = read_and_tell(14)
       seqheader['some_number08']=struct.unpack("<7H",chunk) # 3 ints
-      #print seqheader['some_number08']
+      # maybe this actually is the end of header boundary?
       print print_chunk(chunk, seqheader['some_number08'], "some zeroes:\t\t", args.hex)
       #
       chunk = read_and_tell(4)
@@ -171,13 +158,30 @@ for seqfile in os.listdir(PATH):
           print "If this all looks like crap, don't do it!"
           print ""
 
-      # test struct pack
       if args.replace:
-        print(map(str,seqheader['tempo_map02']))
-        print type(seqheader['tempo_map02'])
-        bytestring=struct.pack("<2H", *seqheader['tempo_map02'])
+        # experimentation, leave for reference
+        #print(map(str,seqheader['tempo_map02']))
+        #print type(seqheader['tempo_map02'])
+        #bytestring=""
+        #bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
         #bytestring=struct.pack("<1H", *seqheader['bars'])
-        print binascii.hexlify(bytestring)
+        #print type(binascii.hexlify(bytestring))
+        #print chunk2hexgroups(binascii.hexlify(bytestring))
+
+        # try to put together header
+        bytestring=""
+        bytestring+=struct.pack("<1H", *seqheader['some_number01'])
+        bytestring+=struct.pack("<1H", *seqheader['some_number02'])
+        bytestring+=struct.pack("16s", *seqheader['version'])
+        bytestring+=struct.pack("<4H", *seqheader['some_number03'])
+        bytestring+=struct.pack("<1H", *seqheader['bars'])
+        bytestring+=struct.pack("<1H", *seqheader['some_number07'])
+        bytestring+=struct.pack("<1H", seqheader['bpm'][0]*10) # e.g. 102.5 bpm is saved as 1025
+        bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
+        bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
+        bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
+        print chunk2hexgroups(bytestring)
+
       # keeping old version and other stuff for reference here:
       #
       #seqheader['fileversion']=struct.unpack('B',didson_data[3:4])[0]
