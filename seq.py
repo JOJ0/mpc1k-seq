@@ -81,7 +81,7 @@ if args.bpm_list:
   print "bpm_list:\t",  bpm_list , "\n"
 
 for seqfile in os.listdir(PATH):
-  if (".SEQ" in seqfile and args.bpm_list is None) or (".SEQ" in seqfile and any(bpm in seqfile for bpm in bpm_list)):
+  if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
     print "############### "+seqfile+" ################"
     with open(PATH+"/"+seqfile, "rb") as f:
       #while True:
@@ -188,11 +188,11 @@ for seqfile in os.listdir(PATH):
 # write new file
 if args.replace:
   for seqfile in os.listdir(PATH):
-    if (".SEQ" in seqfile and args.bpm_list is None) or (".SEQ" in seqfile and any(bpm in seqfile for bpm in bpm_list)):
+    if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
       seqfile_parts=seqfile.partition(".")
       seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
       print "writing "+seqfile_new+" ..."
-      with open(PATH+"/"+seqfile+"_new", "wb") as fw:
+      with open(PATH+"/"+seqfile_new, "wb") as fw:
         fw.write(bytestring)
         fw.close()
 
