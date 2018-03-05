@@ -180,7 +180,17 @@ for seqfile in os.listdir(PATH):
         bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
         bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
         bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
-        print chunk2hexgroups(bytestring)
+        bytestring+=rest_of_file
+        #print chunk2hexgroups(bytestring)
+
+    # write new file
+    if args.replace:
+      for seqfile in os.listdir(PATH):
+        if (".SEQ" in seqfile and args.bpm_list is None) or (".SEQ" in seqfile and any(bpm in seqfile for bpm in bpm_list)):
+          print "writing "+seqfile+"_new ..."
+          with open(PATH+"/"+seqfile+"_new", "wb") as fw:
+            fw.write(bytestring)
+            fw.close()
 
       # keeping old version and other stuff for reference here:
       #
