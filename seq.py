@@ -157,6 +157,8 @@ for seqfile in os.listdir(PATH):
           print "run script again with --replace 'replaceterm' to replace 'searchterm'"
           print "If this all looks like crap, don't do it!"
           print ""
+      else:
+        print ""
 
       if args.replace:
         # experimentation, leave for reference
@@ -183,14 +185,16 @@ for seqfile in os.listdir(PATH):
         bytestring+=rest_of_file
         #print chunk2hexgroups(bytestring)
 
-    # write new file
-    if args.replace:
-      for seqfile in os.listdir(PATH):
-        if (".SEQ" in seqfile and args.bpm_list is None) or (".SEQ" in seqfile and any(bpm in seqfile for bpm in bpm_list)):
-          print "writing "+seqfile+"_new ..."
-          with open(PATH+"/"+seqfile+"_new", "wb") as fw:
-            fw.write(bytestring)
-            fw.close()
+# write new file
+if args.replace:
+  for seqfile in os.listdir(PATH):
+    if (".SEQ" in seqfile and args.bpm_list is None) or (".SEQ" in seqfile and any(bpm in seqfile for bpm in bpm_list)):
+      seqfile_parts=seqfile.partition(".")
+      seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
+      print "writing "+seqfile_new+" ..."
+      with open(PATH+"/"+seqfile+"_new", "wb") as fw:
+        fw.write(bytestring)
+        fw.close()
 
       # keeping old version and other stuff for reference here:
       #
