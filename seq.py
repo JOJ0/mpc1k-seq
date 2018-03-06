@@ -170,12 +170,13 @@ for seqfile in os.listdir(PATH):
             bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
             bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
             bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
-            bytestring+=rest_of_file
             #print chunk2hexgroups(bytestring)
             # generate new filename and write the file we are reading at the moment
             print "!!! replacing \""+args.searchterm+"\" with \""+args.replaceterm+"\", "
             seqfile_parts=seqfile.partition(".")
             seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
+            rest_of_file=rest_of_file.replace(args.searchterm, args.replaceterm, 1)
+            bytestring+=rest_of_file
             print "!!! and writing "+seqfile_new+" ..."
             with open(PATH+"/"+seqfile_new, "wb") as fw:
               fw.write(bytestring)
