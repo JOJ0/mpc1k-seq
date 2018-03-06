@@ -62,23 +62,26 @@ def print_chunk(chunk, data,  descr, hexflag=0):
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.seq files to be processed")
 parser.add_argument("--search", "-s", help="search for given string in file contents, show in output when found", type=str, dest="searchterm")
-parser.add_argument("--replace", "-r", help="really replace ascii in seq file", action="store_true")
+parser.add_argument("--replace", "-r", help="really replace ascii in seq file", type=str, dest="replaceterm")
 parser.add_argument("--bpm", "-b", help="space separated BPM list (actually any string in filename will be searched for", type=str, dest="bpm_list")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
 args = parser.parse_args()
 
 PATH=args.path
-print "\nPATH used:\t" + PATH + "\n"
+print "\n* PATH used: " + PATH + ""
 
-if args.replace:
-  print "asciireplacer is enabled - well, currently not really - in development\n"
+if args.searchterm:
+  print "* searching for \""+args.searchterm+"\" (only in the part after the header)"
+
+if args.replaceterm:
+  print "* replacer is enabled!!! replaceterm is \""+args.replaceterm+"\""
 
 if args.hex:
-  print "show hex values is enabled\n"
+  print "* show hex values is enabled"
 
 if args.bpm_list:
   bpm_list = args.bpm_list.split(' ')
-  print "bpm_list:\t",  bpm_list , "\n"
+  print "* bpm_list:\t",  bpm_list , "\n"
 
 for seqfile in os.listdir(PATH):
   if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
@@ -154,47 +157,35 @@ for seqfile in os.listdir(PATH):
           print "this would be the first half of the filename:\t"+rest_of_file[index:index+8]
           print "and this would be the second half:\t\t"+rest_of_file[index+8+8:index+8+8+8]
           print "(max chars in filename total is 16)"
-          print "run script again with --replace 'replaceterm' to replace 'searchterm'"
-          print "If this all looks like crap, don't do it!"
+          if args.replaceterm:
+            # putting together header
+            bytestring=""
+            bytestring+=struct.pack("<1H", *seqheader['some_number01'])
+            bytestring+=struct.pack("<1H", *seqheader['some_number02'])
+            bytestring+=struct.pack("16s", *seqheader['version'])
+            bytestring+=struct.pack("<4H", *seqheader['some_number03'])
+            bytestring+=struct.pack("<1H", *seqheader['bars'])
+            bytestring+=struct.pack("<1H", *seqheader['some_number07'])
+            bytestring+=struct.pack("<1H", seqheader['bpm'][0]*10) # e.g. 102.5 bpm is saved as 1025
+            bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
+            bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
+            bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
+            bytestring+=rest_of_file
+            #print chunk2hexgroups(bytestring)
+            # generate new filename and write the file we are reading at the moment
+            print "!!! replacing \""+args.searchterm+"\" with \""+args.replaceterm+"\", "
+            seqfile_parts=seqfile.partition(".")
+            seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
+            print "!!! and writing "+seqfile_new+" ..."
+            with open(PATH+"/"+seqfile_new, "wb") as fw:
+              fw.write(bytestring)
+              fw.close()
+          else:
+            print "run script again with --replace 'replaceterm' to replace 'searchterm'"
+            print "If this all looks like crap, don't do it!"
           print ""
       else:
         print ""
-
-      if args.replace:
-        # experimentation, leave for reference
-        #print(map(str,seqheader['tempo_map02']))
-        #print type(seqheader['tempo_map02'])
-        #bytestring=""
-        #bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
-        #bytestring=struct.pack("<1H", *seqheader['bars'])
-        #print type(binascii.hexlify(bytestring))
-        #print chunk2hexgroups(binascii.hexlify(bytestring))
-
-        # try to put together header
-        bytestring=""
-        bytestring+=struct.pack("<1H", *seqheader['some_number01'])
-        bytestring+=struct.pack("<1H", *seqheader['some_number02'])
-        bytestring+=struct.pack("16s", *seqheader['version'])
-        bytestring+=struct.pack("<4H", *seqheader['some_number03'])
-        bytestring+=struct.pack("<1H", *seqheader['bars'])
-        bytestring+=struct.pack("<1H", *seqheader['some_number07'])
-        bytestring+=struct.pack("<1H", seqheader['bpm'][0]*10) # e.g. 102.5 bpm is saved as 1025
-        bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
-        bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
-        bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
-        bytestring+=rest_of_file
-        #print chunk2hexgroups(bytestring)
-
-# write new file
-if args.replace:
-  for seqfile in os.listdir(PATH):
-    if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
-      seqfile_parts=seqfile.partition(".")
-      seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
-      print "writing "+seqfile_new+" ..."
-      with open(PATH+"/"+seqfile_new, "wb") as fw:
-        fw.write(bytestring)
-        fw.close()
 
       # keeping old version and other stuff for reference here:
       #
