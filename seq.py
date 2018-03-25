@@ -150,14 +150,30 @@ for seqfile in os.listdir(PATH):
       #  print "found Blues"
       if args.searchterm:
         length=len(args.searchterm)
+        if length > 16:
+          sys.stderr.write('searchterm too long, max chars: 16, exiting...\n')
+          raise SystemExit(2)
+        if length > 8:
+          sys.stderr.write('searchterm too long, max chars: 8, may support 16 in the future, exiting.\n')
+          raise SystemExit(3)
+          firsthalf=args.searchterm[0:8]
+          secondhalf=args.searchterm[8:length]
+          print firsthalf
+          print secondhalf
         index = rest_of_file.find(args.searchterm)
         if index != -1:
-          print "Found your searchterm at index "+str(index)+", it's "+str(length)+" characters long"
+          print "Found first occurence of searchterm at index "+str(index)+", it's "+str(length)+" chars long"
           print "If your searchterm is the START of a filename in an Audio Track,"
           print "this would be the first half of the filename:\t"+rest_of_file[index:index+8]
           print "and this would be the second half:\t\t"+rest_of_file[index+8+8:index+8+8+8]
+          if args.hex:
+            print "first half hex:\t\t"+chunk2hexgroups(rest_of_file[index:index+8])
+            print "second half hex:\t"+chunk2hexgroups(rest_of_file[index+8+8:index+8+8+8])
           print "(max chars in filename total is 16)"
           if args.replaceterm:
+            if len(args.replaceterm) > 8:
+              sys.stderr.write('replaceterm too long, max chars: 8, may support 16 in the future, exiting.\n')
+              raise SystemExit(4)
             # putting together header
             bytestring=""
             bytestring+=struct.pack("<1H", *seqheader['some_number01'])
@@ -172,18 +188,20 @@ for seqfile in os.listdir(PATH):
             bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
             #print chunk2hexgroups(bytestring)
             # generate new filename and write the file we are reading at the moment
-            print "!!! replacing \""+args.searchterm+"\" with \""+args.replaceterm+"\", "
-            seqfile_parts=seqfile.partition(".")
-            seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
+            print "!!! replacing first occurence of \""+args.searchterm+"\" with \""+args.replaceterm+"\", "
+            # actually we don't need these 2 lines anymore, we just overwrite files
+            #seqfile_parts=seqfile.partition(".")
+            #seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
             rest_of_file=rest_of_file.replace(args.searchterm, args.replaceterm, 1)
             bytestring+=rest_of_file
-            print "!!! and writing "+seqfile_new+" ..."
-            with open(PATH+"/"+seqfile_new, "wb") as fw:
+            f.close()
+            print "!!! and overwriting "+seqfile+" ..."
+            with open(PATH+"/"+seqfile, "wb") as fw:
               fw.write(bytestring)
               fw.close()
           else:
             print "run script again with --replace 'replaceterm' to replace 'searchterm'"
-            print "If this all looks like crap, don't do it!"
+            print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
           print ""
       else:
         print ""
