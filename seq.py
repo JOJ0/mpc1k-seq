@@ -59,11 +59,38 @@ def print_chunk(chunk, data,  descr, hexflag=0):
   if hexflag==1: hexgroup="| "+chunk2hexgroups(chunk)+" |"
   return bytehex_beg+"\t"+descr+data_list+"\t"+hexgroup
 
+def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceterm="", bpm_new=0):
+  bytestring=""
+  bytestring+=struct.pack("<1H", *seqheader['some_number01'])
+  bytestring+=struct.pack("<1H", *seqheader['some_number02'])
+  bytestring+=struct.pack("16s", *seqheader['version'])
+  bytestring+=struct.pack("<4H", *seqheader['some_number03'])
+  bytestring+=struct.pack("<1H", *seqheader['bars'])
+  bytestring+=struct.pack("<1H", *seqheader['some_number07'])
+  bytestring+=struct.pack("<1H", seqheader['bpm'][0]*10) # e.g. 102.5 bpm is saved as 1025
+  bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
+  bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
+  bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
+  #print chunk2hexgroups(bytestring)
+  # replace string and write the file we are reading at the moment
+  if replaceterm:
+    print "!!! replacing first occurence of \""+searchterm+"\" with \""+replaceterm+"\", "
+    rest_of_file=rest_of_file.replace(searchterm, replaceterm, 1)
+    bytestring+=rest_of_file
+  # close file handle, create writable one and (over)write
+  currentfile.close()
+  print "!!! and overwriting "+currentfile.name+" ..."
+  print currentfile.name
+  with open(currentfile.name, "wb") as fw:
+    fw.write(bytestring)
+    fw.close()
+
 parser = argparse.ArgumentParser()
-parser.add_argument("path", help="path of *.seq files to be processed")
-parser.add_argument("--search", "-s", help="search for given string in file contents, show in output when found", type=str, dest="searchterm")
-parser.add_argument("--replace", "-r", help="really replace ascii in seq file", type=str, dest="replaceterm")
+parser.add_argument("path", help="path of *.SEQ files to be processed")
+parser.add_argument("--search", "-s", help="search for given string in file contents", type=str, dest="searchterm")
+parser.add_argument("--replace", "-r", help="replace SEARCHTERM with REPLACETERM", type=str, dest="replaceterm")
 parser.add_argument("--bpm", "-b", help="space separated BPM list (actually any string in filename will be searched for", type=str, dest="bpm_list")
+parser.add_argument("--correct-bpm", "-c", help="set BPM to the same as in filename", action="store_true")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
 args = parser.parse_args()
 
@@ -71,7 +98,7 @@ PATH=args.path
 print "\n* PATH used: " + PATH + ""
 
 if args.searchterm:
-  print "* searching for \""+args.searchterm+"\" (only in the part after the header)"
+  print "* searching for \""+args.searchterm+"\" (after End of header)"
 
 if args.replaceterm:
   print "* replacer is enabled!!! replaceterm is \""+args.replaceterm+"\""
@@ -121,8 +148,10 @@ for seqfile in os.listdir(PATH):
       #
       chunk = read_and_tell(2)
       seqheader['bpm']=struct.unpack("<H",chunk)
-      seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divde by 10 and create a tuple again
+      seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divide by 10 and create a tuple again
       print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", args.hex)
+      if str(seqheader['bpm'][0]) not in seqfile:
+        print "bpm in filename is different! correct with -c"
       #
       chunk = read_and_tell(14)
       seqheader['some_number08']=struct.unpack("<7H",chunk) # 3 ints
@@ -137,7 +166,7 @@ for seqfile in os.listdir(PATH):
       seqheader['tempo_map02']=struct.unpack("<2H",chunk)
       print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
       #
-      print "############### End of Header ###############"
+      print "############### End of header ###############"
       # read to end of file and store in ordinary var
       #rest_of_file = read_and_tell(0)
       rest_of_file = f.read()
@@ -174,31 +203,8 @@ for seqfile in os.listdir(PATH):
             if len(args.replaceterm) > 8:
               sys.stderr.write('replaceterm too long, max chars: 8, may support 16 in the future, exiting.\n')
               raise SystemExit(4)
-            # putting together header
-            bytestring=""
-            bytestring+=struct.pack("<1H", *seqheader['some_number01'])
-            bytestring+=struct.pack("<1H", *seqheader['some_number02'])
-            bytestring+=struct.pack("16s", *seqheader['version'])
-            bytestring+=struct.pack("<4H", *seqheader['some_number03'])
-            bytestring+=struct.pack("<1H", *seqheader['bars'])
-            bytestring+=struct.pack("<1H", *seqheader['some_number07'])
-            bytestring+=struct.pack("<1H", seqheader['bpm'][0]*10) # e.g. 102.5 bpm is saved as 1025
-            bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
-            bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
-            bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
-            #print chunk2hexgroups(bytestring)
-            # generate new filename and write the file we are reading at the moment
-            print "!!! replacing first occurence of \""+args.searchterm+"\" with \""+args.replaceterm+"\", "
-            # actually we don't need these 2 lines anymore, we just overwrite files
-            #seqfile_parts=seqfile.partition(".")
-            #seqfile_new=seqfile_parts[0]+"_new"+seqfile_parts[1]+seqfile_parts[2]
-            rest_of_file=rest_of_file.replace(args.searchterm, args.replaceterm, 1)
-            bytestring+=rest_of_file
-            f.close()
-            print "!!! and overwriting "+seqfile+" ..."
-            with open(PATH+"/"+seqfile, "wb") as fw:
-              fw.write(bytestring)
-              fw.close()
+            # function that does the writing stuff here
+            writeseqfile(f, seqheader, rest_of_file, searchterm=args.searchterm, replaceterm=args.replaceterm, bpm_new=0)
           else:
             print "run script again with --replace 'replaceterm' to replace 'searchterm'"
             print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
