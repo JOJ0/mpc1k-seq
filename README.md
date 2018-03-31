@@ -5,22 +5,22 @@ I often use MPC1000 as a backing track loop player. I have the same drum loops i
 
 ```
 usage: seq.py [-h] [--search SEARCHTERM] [--replace REPLACETERM]
-              [--bpm BPM_LIST] [--hex]
+              [--bpm BPM_LIST] [--correct-bpm] [--hex]
               path
 
 positional arguments:
-  path                  path of *.seq files to be processed
+  path                  path of *.SEQ files to be processed
 
 optional arguments:
   -h, --help            show this help message and exit
   --search SEARCHTERM, -s SEARCHTERM
-                        search for given string in file contents, show in
-                        output when found
+                        search for given string in file contents
   --replace REPLACETERM, -r REPLACETERM
-                        replace SEARCHTERM with REPLACETERM in seq file
+                        replace SEARCHTERM with REPLACETERM
   --bpm BPM_LIST, -b BPM_LIST
                         space separated BPM list (actually any string in
-                        filename will be searched for
+                        filename will be searched for)
+  --correct-bpm, -c     set BPM to the same as in filename
   --hex, -x             show hex values next to decimal and strings
 ```
 
