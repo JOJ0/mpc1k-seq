@@ -59,7 +59,14 @@ def print_chunk(chunk, data,  descr, hexflag=0):
   if hexflag==1: hexgroup="| "+chunk2hexgroups(chunk)+" |"
   return bytehex_beg+"\t"+descr+data_list+"\t"+hexgroup
 
-def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceterm="", bpm_new=0):
+def writeseqfile(currentfile, seqheader, rest_of_file, searchterm=None, replaceterm=None, bpm_new=0):
+  # replace string
+  if replaceterm:
+    if len(replaceterm) > 8:
+      sys.stderr.write('replaceterm too long, max chars: 8, may support 16 in the future, exiting.\n')
+      raise SystemExit(4)
+    print "!!! replacing first occurence of \""+searchterm+"\" with \""+replaceterm+"\", "
+    rest_of_file=rest_of_file.replace(searchterm, replaceterm, 1)
   bytestring=""
   bytestring+=struct.pack("<1H", *seqheader['some_number01'])
   bytestring+=struct.pack("<1H", *seqheader['some_number02'])
@@ -67,58 +74,102 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
   bytestring+=struct.pack("<4H", *seqheader['some_number03'])
   bytestring+=struct.pack("<1H", *seqheader['bars'])
   bytestring+=struct.pack("<1H", *seqheader['some_number07'])
-  bytestring+=struct.pack("<1H", seqheader['bpm'][0]*10) # e.g. 102.5 bpm is saved as 1025
+  if bpm_new > 0:
+    print "!!! replacing bpm value, "
+    bytestring+=struct.pack("<1H", bpm_new*10)
+  else:
+    bytestring+=struct.pack("<1H", seqheader['bpm'][0]*10)
   bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
   bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
   bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
   #print chunk2hexgroups(bytestring)
-  # replace string and write the file we are reading at the moment
-  if replaceterm:
-    print "!!! replacing first occurence of \""+searchterm+"\" with \""+replaceterm+"\", "
-    rest_of_file=rest_of_file.replace(searchterm, replaceterm, 1)
-    bytestring+=rest_of_file
-  # close file handle, create writable one and (over)write
+  # attach rest of seq file
+  bytestring+=rest_of_file
+  # close file-read handle, create writable one and (over)write
   currentfile.close()
   print "!!! and overwriting "+currentfile.name+" ..."
-  print currentfile.name
   with open(currentfile.name, "wb") as fw:
     fw.write(bytestring)
     fw.close()
+
+def stringsearch(rest_of_file, searchterm):
+  length=len(searchterm)
+  if length > 16:
+    sys.stderr.write('searchterm too long, max chars: 16, exiting...\n')
+    raise SystemExit(2)
+  if length > 8:
+    sys.stderr.write('searchterm too long, max chars: 8, may support 16 in the future, exiting.\n')
+    raise SystemExit(3)
+    firsthalf=searchterm[0:8]
+    secondhalf=searchterm[8:length]
+    print firsthalf
+    print secondhalf
+  index = rest_of_file.find(searchterm)
+  if index != -1:
+    print "Found first occurence of searchterm at index "+str(index)+", it's "+str(length)+" chars long"
+    print "If your searchterm is the START of a filename in an Audio Track,"
+    print "this would be the first half of the filename:\t"+rest_of_file[index:index+8]
+    print "and this would be the second half:\t\t"+rest_of_file[index+8+8:index+8+8+8]
+    if args.hex:
+      print "first half hex:\t\t"+chunk2hexgroups(rest_of_file[index:index+8])
+      print "second half hex:\t"+chunk2hexgroups(rest_of_file[index+8+8:index+8+8+8])
+    print "(max chars in filename total is 16)"
+    return True
+  else:
+    print "your SEARCHTERM \""+searchterm+"\" was not found!"
+    return False
+
+def bpmfind(filename):
+  bpm=0
+  splitted=filename.split("_")
+  for i in splitted:
+    if i.isdigit():
+      bpm=int(i)
+      print "found underscore seperated bpm value in filename: "+str(bpm)
+  # if we still dont have a possible bpm value, continue with dash search
+  if bpm==0:
+    splitted=filename.split("-")
+    for i in splitted:
+      if i.isdigit():
+        bpm=int(i)
+        print "found dash seperated bpm value in filename: "+str(bpm)
+  # if we still dont have a bpm value, give up!
+  if bpm==0:
+    print "didn't find a possible bpm value in filename, "
+    print "use underscores or dashed as separating characters"
+  return int(bpm)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.SEQ files to be processed")
 parser.add_argument("--search", "-s", help="search for given string in file contents", type=str, dest="searchterm")
 parser.add_argument("--replace", "-r", help="replace SEARCHTERM with REPLACETERM", type=str, dest="replaceterm")
-parser.add_argument("--bpm", "-b", help="space separated BPM list (actually any string in filename will be searched for)", type=str, dest="bpm_list")
+parser.add_argument("--bpm", "-b", help="space seperated BPM list (actually any string in filename will be searched for)", type=str, dest="bpm_list")
 parser.add_argument("--correct-bpm", "-c", help="set BPM to the same as in filename", action="store_true")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
 args = parser.parse_args()
 
+if args.replaceterm and not args.searchterm:
+  parser.error("--replace (-r) does not make sense without --search (-s)")
 PATH=args.path
 print "\n* PATH used: " + PATH + ""
-
 if args.searchterm:
   print "* searching for \""+args.searchterm+"\" (after End of header)"
-
 if args.replaceterm:
-  print "* replacer is enabled!!! replaceterm is \""+args.replaceterm+"\""
-
+  print "* replacer is enabled! replaceterm is \""+args.replaceterm+"\""
 if args.hex:
   print "* show hex values is enabled"
-
 if args.bpm_list:
   bpm_list = args.bpm_list.split(' ')
-  print "* bpm_list:\t",  bpm_list , "\n"
+  print "* bpm_list:\t",  bpm_list
+if args.correct_bpm:
+  print "* bpm-correct is enabled!"
+print "" # just some space
 
 for seqfile in os.listdir(PATH):
   if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
     print "############### "+seqfile+" ################"
     with open(PATH+"/"+seqfile, "rb") as f:
-      #while True:
       #chunk = f.read(47) # read up to end of header 0x002f
-      #chunk = f.read(4) # read first 4
-      #if not chunk:
-      #  break
       # header data will be written into this dictionary,
       # each element read from struct.unpack is a tuple!
       seqheader={}
@@ -168,49 +219,32 @@ for seqfile in os.listdir(PATH):
       #
       print "############### End of header ###############"
       # read to end of file and store in ordinary var
-      #rest_of_file = read_and_tell(0)
       rest_of_file = f.read()
-      #seqheader['rest_of_file']=struct.unpack("<2H",chunk)
-      #print print_chunk(chunk, seqheader['rest_of_file'], "rest of file:\t\t", args.hex)
       # debug print binary
       #print print_chunk(chunk, chunk, "rest of file:\t\t", args.hex)
       # search for string in rest of file
-      #if "blues" in rest_of_file:
-      #  print "found Blues"
       if args.searchterm:
-        length=len(args.searchterm)
-        if length > 16:
-          sys.stderr.write('searchterm too long, max chars: 16, exiting...\n')
-          raise SystemExit(2)
-        if length > 8:
-          sys.stderr.write('searchterm too long, max chars: 8, may support 16 in the future, exiting.\n')
-          raise SystemExit(3)
-          firsthalf=args.searchterm[0:8]
-          secondhalf=args.searchterm[8:length]
-          print firsthalf
-          print secondhalf
-        index = rest_of_file.find(args.searchterm)
-        if index != -1:
-          print "Found first occurence of searchterm at index "+str(index)+", it's "+str(length)+" chars long"
-          print "If your searchterm is the START of a filename in an Audio Track,"
-          print "this would be the first half of the filename:\t"+rest_of_file[index:index+8]
-          print "and this would be the second half:\t\t"+rest_of_file[index+8+8:index+8+8+8]
-          if args.hex:
-            print "first half hex:\t\t"+chunk2hexgroups(rest_of_file[index:index+8])
-            print "second half hex:\t"+chunk2hexgroups(rest_of_file[index+8+8:index+8+8+8])
-          print "(max chars in filename total is 16)"
-          if args.replaceterm:
-            if len(args.replaceterm) > 8:
-              sys.stderr.write('replaceterm too long, max chars: 8, may support 16 in the future, exiting.\n')
-              raise SystemExit(4)
-            # function that does the writing stuff here
-            writeseqfile(f, seqheader, rest_of_file, searchterm=args.searchterm, replaceterm=args.replaceterm, bpm_new=0)
-          else:
+        stringfound=stringsearch(rest_of_file, args.searchterm)
+        # several possible write combinations:
+        if args.replaceterm and args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, bpmfind(seqfile))
+        elif args.replaceterm and stringfound==True:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, 0)
+        # also write file if searching, but nothing is found and only correcting bpm
+        elif stringfound==False and args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, None, None, bpmfind(seqfile))
+        else:
+          # only print this if we found something but are NOT replacing it already
+          if stringfound==True:
             print "run script again with --replace 'replaceterm' to replace 'searchterm'"
             print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
-          print ""
       else:
-        print ""
+        if args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, None, None, bpmfind(seqfile))
+        # only print this if NOT replacing string
+        #print "run script again with --replace 'replaceterm' to replace 'searchterm'"
+        #print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
+      print ""
 
       # keeping old version and other stuff for reference here:
       #
