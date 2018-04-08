@@ -59,14 +59,25 @@ def print_chunk(chunk, data,  descr, hexflag=0):
   if hexflag==1: hexgroup="| "+chunk2hexgroups(chunk)+" |"
   return bytehex_beg+"\t"+descr+data_list+"\t"+hexgroup
 
-def writeseqfile(currentfile, seqheader, rest_of_file, searchterm=None, replaceterm=None, bpm_new=0):
+def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceterm="", bpm_new=0, foundindex=0):
+  # strip possible .SEQ ending
+  replaceterm=replaceterm.replace(".SEQ", "") 
   # replace string
   if replaceterm:
-    if len(replaceterm) > 8:
-      sys.stderr.write('replaceterm too long, max chars: 8, may support 16 in the future, exiting.\n')
+    if len(replaceterm) > 16:
+      sys.stderr.write("replaceterm ("+replaceterm+") too long, max chars: 16, exiting.\n")
       raise SystemExit(4)
-    print "!!! replacing first occurence of \""+searchterm+"\" with \""+replaceterm+"\", "
-    rest_of_file=rest_of_file.replace(searchterm, replaceterm, 1)
+    elif len(replaceterm) > 8:
+      #print "DEBUG: we need to cut REPLACETERM, it's between 8 and 16 chars"
+      #print "DEBUG: index:\t"+str(foundindex)
+      print "!!! putting \""+replace_part(replaceterm)["first"]+"\" where \""+get_wav_first(rest_of_file, foundindex)+"\", "
+      rest_of_file=rest_of_file.replace(get_wav_first(rest_of_file, foundindex), replace_part(replaceterm)["first"], 1)
+      print "!!! putting \""+replace_part(replaceterm)["second"]+"\" where \""+get_wav_second(rest_of_file, foundindex)+"\", "
+      rest_of_file=rest_of_file.replace(get_wav_second(rest_of_file, foundindex), replace_part(replaceterm)["second"], 1)
+    else:
+      #print "DEBUG: replaceterm is max 8 chars long, just replacing"
+      print "!!! replacing first occurence of \""+searchterm+"\" with \""+replaceterm+"\", "
+      rest_of_file=rest_of_file.replace(searchterm, replaceterm, 1)
   bytestring=""
   bytestring+=struct.pack("<1H", *seqheader['some_number01'])
   bytestring+=struct.pack("<1H", *seqheader['some_number02'])
@@ -82,15 +93,32 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm=None, replacet
   bytestring+=struct.pack("<7H", *seqheader['some_number08']) # 3 ints
   bytestring+=struct.pack("<2H", *seqheader['tempo_map01'])
   bytestring+=struct.pack("<2H", *seqheader['tempo_map02'])
-  #print chunk2hexgroups(bytestring)
+  #print "DEBUG: \n"+chunk2hexgroups(bytestring)
   # attach rest of seq file
   bytestring+=rest_of_file
   # close file-read handle, create writable one and (over)write
   currentfile.close()
   print "!!! and overwriting "+currentfile.name+" ..."
+  #print "DEBUG: not really writing"
   with open(currentfile.name, "wb") as fw:
     fw.write(bytestring)
     fw.close()
+
+def replace_part(term):
+  #print "DEBUG: replaceterm before splitting: "+term
+  dict={"first": str(term[0:8]).ljust(8, "\x00"),
+        "second": str(term[8:len(term)]).ljust(8, "\x00")}
+  return dict 
+
+def get_wav_first(buf, index):
+  #if str(0000) in binascii.hexlify(buf[index:index+8]):
+  #  print "WARNING: there are binary zeroes at wav file position, something wrong?"
+  return buf[index:index+8]
+
+def get_wav_second(buf, index):
+  #if str(0000) in binascii.hexlify(buf[index+16:index+16+8]):
+  #  print "WARNING: there are binary zeroes at wav file position, something wrong?"
+  return buf[index+16:index+16+8]
 
 def stringsearch(rest_of_file, searchterm):
   length=len(searchterm)
@@ -100,35 +128,30 @@ def stringsearch(rest_of_file, searchterm):
   if length > 8:
     sys.stderr.write('searchterm too long, max chars: 8, may support 16 in the future, exiting.\n')
     raise SystemExit(3)
-    firsthalf=searchterm[0:8]
-    secondhalf=searchterm[8:length]
-    print firsthalf
-    print secondhalf
   index = rest_of_file.find(searchterm)
   if index != -1:
-    print "Found first occurence of searchterm at index "+str(index)+", it's "+str(length)+" chars long"
-    print "If your searchterm is the START of a filename in an Audio Track,"
-    print "this would be the first half of the filename:\t"+rest_of_file[index:index+8]
-    print "and this would be the second half:\t\t"+rest_of_file[index+8+8:index+8+8+8]
+    print "Found first occurence of SEARCHTERM at index "+str(index)+", it's "+str(length)+" chars long"
+    print "If SEARCHTERM is the START of a wav filename in an Audio Track,"
+    print "this would be the first half:\t\t\""+get_wav_first(rest_of_file, index)+"\""
+    print "and this would be the second half:\t\""+get_wav_second(rest_of_file, index)+"\""
     if args.hex:
-      print "first half hex:\t\t"+chunk2hexgroups(rest_of_file[index:index+8])
-      print "second half hex:\t"+chunk2hexgroups(rest_of_file[index+8+8:index+8+8+8])
-    print "(max chars in filename total is 16)"
-    return True
+      print "first half hex:\t\t"+chunk2hexgroups(get_wav_first(rest_of_file, index))
+      print "second half hex:\t"+chunk2hexgroups(get_wav_second(rest_of_file, index))
+    return index
   else:
     print "your SEARCHTERM \""+searchterm+"\" was not found!"
-    return False
+    return 0
 
-def bpmfind(filename):
+def bpmfind(sometext):
   bpm=0
-  splitted=filename.split("_")
+  splitted=sometext.split("_")
   for i in splitted:
     if i.isdigit():
       bpm=int(i)
       print "found underscore seperated bpm value in filename: "+str(bpm)
   # if we still dont have a possible bpm value, continue with dash search
   if bpm==0:
-    splitted=filename.split("-")
+    splitted=sometext.split("-")
     for i in splitted:
       if i.isdigit():
         bpm=int(i)
@@ -143,6 +166,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.SEQ files to be processed")
 parser.add_argument("--search", "-s", help="search for given string in file contents", type=str, dest="searchterm")
 parser.add_argument("--replace", "-r", help="replace SEARCHTERM with REPLACETERM", type=str, dest="replaceterm")
+parser.add_argument("--correct-wav", "-w", help="sets basename of .SEQ file to the place where SEARCHTERM is found. Use this if your seq and wav files are named identically", action="store_true")
 parser.add_argument("--bpm", "-b", help="space seperated BPM list (actually any string in filename will be searched for)", type=str, dest="bpm_list")
 parser.add_argument("--correct-bpm", "-c", help="set BPM to the same as in filename", action="store_true")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
@@ -150,6 +174,10 @@ args = parser.parse_args()
 
 if args.replaceterm and not args.searchterm:
   parser.error("--replace (-r) does not make sense without --search (-s)")
+if args.replaceterm and args.correct_wav:
+  parser.error("you can either --replace (-r) or --correct-wav (-w)")
+if args.correct_wav and not args.searchterm:
+  parser.error("--correct-wav (-w) does not make sense without --search (-s)")
 PATH=args.path
 print "\n* PATH used: " + PATH + ""
 if args.searchterm:
@@ -169,6 +197,7 @@ for seqfile in os.listdir(PATH):
   if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
     print "############### "+seqfile+" ################"
     with open(PATH+"/"+seqfile, "rb") as f:
+      seqfbase=seqfile.replace(".SEQ", "")
       #chunk = f.read(47) # read up to end of header 0x002f
       # header data will be written into this dictionary,
       # each element read from struct.unpack is a tuple!
@@ -201,7 +230,7 @@ for seqfile in os.listdir(PATH):
       seqheader['bpm']=struct.unpack("<H",chunk)
       seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divide by 10 and create a tuple again
       print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", args.hex)
-      if str(seqheader['bpm'][0]) not in seqfile:
+      if str(seqheader['bpm'][0]) not in seqfbase:
         print "bpm in filename is different! correct with -c"
       #
       chunk = read_and_tell(14)
@@ -224,23 +253,36 @@ for seqfile in os.listdir(PATH):
       #print print_chunk(chunk, chunk, "rest of file:\t\t", args.hex)
       # search for string in rest of file
       if args.searchterm:
-        stringfound=stringsearch(rest_of_file, args.searchterm)
+        foundindex=stringsearch(rest_of_file, args.searchterm)
         # several possible write combinations:
-        if args.replaceterm and args.correct_bpm:
-          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, bpmfind(seqfile))
-        elif args.replaceterm and stringfound==True:
-          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, 0)
-        # also write file if searching, but nothing is found and only correcting bpm
-        elif stringfound==False and args.correct_bpm:
-          writeseqfile(f, seqheader, rest_of_file, None, None, bpmfind(seqfile))
-        else:
-          # only print this if we found something but are NOT replacing it already
-          if stringfound==True:
-            print "run script again with --replace 'replaceterm' to replace 'searchterm'"
-            print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
+        # write file if FOUND, CORRECT_WAV and BPM
+        if foundindex >0 and args.correct_wav and args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, bpmfind(seqfile), foundindex)
+        # write file if FOUND, REPLACE and BPM
+        elif foundindex >0 and args.replaceterm and args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, bpmfind(seqfile), foundindex)
+        # write file if FOUND, REPLACE
+        elif foundindex >0 and args.replaceterm:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, 0, foundindex)
+        # write file if FOUND and CORRECT_WAV
+        elif foundindex >0 and args.correct_wav:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, 0, foundindex)
+        # write file if NOTHING is found and CORRECT_BPM
+        elif foundindex==0 and args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
+        # only print this if we found something but are NOT replacing it already
+        elif foundindex >0:
+          print "** REPLACE OPTIONS: *************************"
+          print "** run again with --replace 'REPLACETERM' to simply replace 'SEARCHTERM',"
+          print "** or with --correct-wav (-w) to put this files name at SEARCHTERMs position."
+          print "** -w would replace \t\""+get_wav_first(rest_of_file, foundindex)+"\" with \""+replace_part(seqfbase)["first"]+"\","
+          print "** and \t\t\t\""+get_wav_second(rest_of_file, foundindex)+"\" with \""+replace_part(seqfbase)["second"]+"\"."
+          print "** if this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
+          if args.correct_bpm:
+            writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
       else:
         if args.correct_bpm:
-          writeseqfile(f, seqheader, rest_of_file, None, None, bpmfind(seqfile))
+          writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
         # only print this if NOT replacing string
         #print "run script again with --replace 'replaceterm' to replace 'searchterm'"
         #print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
