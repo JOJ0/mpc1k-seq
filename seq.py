@@ -143,6 +143,7 @@ def stringsearch(rest_of_file, searchterm):
     return 0
 
 def bpmfind(sometext):
+  """finds possible bpm values in strings"""
   bpm=0
   splitted=sometext.split("_")
   for i in splitted:
