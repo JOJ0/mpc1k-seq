@@ -135,3 +135,12 @@ robert: Tempo berechnen ist dann z.B., fuer text='\x09\xF6': tempo = ord(text[:1
 
 robert: alright, ist little endian
 [10:35am] robert: muss man also umdrehen beim rechnen, 0x7a 0x03 == 0x037A == 890 => Tempo 89
+
+=== 2018-04-13===
+position (=index in python): 7184
+is this the marker for tr1 wav (first half)?
+0000 0000 0188 0000 8byte_wav1_here
+and this for tr1 wav (second half)?
+0000 0000 0188 01FF 8byte_wav2_here
+
+FIXME -w should truncate 2nd part of seqfilename to 8 bytes!

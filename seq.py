@@ -163,21 +163,23 @@ def bpmfind(sometext, leading_zero=False):
   splitted=sometext.split("_")
   for i in splitted:
     if i.isdigit():
-      bpm=int(i)
-      if leading_zero==False:
-        print "found underscore seperated bpm value in filename: "+str(bpm)
+      if int(i) > 49:
+        bpm=int(i)
+        if leading_zero==False:
+          print "found underscore seperated bpm value in filename: "+str(bpm)
   # if we still dont have a possible bpm value, continue with dash search
   if bpm==0:
     splitted=sometext.split("-")
     for i in splitted:
       if i.isdigit():
-        bpm=int(i)
-        if leading_zero==False:
-          print "found dash seperated bpm value in filename: "+str(bpm)
+        if int(i) > 49:
+          bpm=int(i)
+          if leading_zero==False:
+            print "found dash seperated bpm value in filename: "+str(bpm)
   # if we still dont have a bpm value, give up!
   if bpm==0:
     print "didn't find a possible bpm value in filename, "
-    print "use underscores or dashed as separating characters"
+    print "use underscores or dashed as seperating characters"
   if leading_zero==True:
     return str(bpm).zfill(3)
   else:
