@@ -57,7 +57,8 @@ def print_chunk(chunk, data,  descr, hexflag=0):
   data_list=" ".join(map(str,data))
   hexgroup=""
   if hexflag==1: hexgroup="| "+chunk2hexgroups(chunk)+" |"
-  return bytehex_beg+"\t"+descr+data_list+"\t"+hexgroup
+  # for now set position output to decimal, FIXME should this be configurable? 
+  return str(bytedec_beg)+"\t"+descr+data_list+"\t"+hexgroup
 
 def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceterm="", bpm_new=0, foundindex=0):
   # strip possible .SEQ ending
@@ -241,53 +242,43 @@ for seqfile in os.listdir(PATH):
       seqheader['some_number01']=struct.unpack("<H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number01'], "first 2 bytes\t\t", args.hex)
-      #
       chunk = read_and_tell(2) # read next bytes
       seqheader['some_number02']=struct.unpack("<H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number02'], "zero:\t\t\t", args.hex)
-      #
       chunk = read_and_tell(16) # read next bytes
       seqheader['version']=struct.unpack("16s",chunk)
       print print_chunk(chunk, seqheader['version'], "version:\t\t", args.hex)
-      #
       chunk = read_and_tell(8) # read next bytes
       seqheader['some_number03']=struct.unpack("<4H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number03'], "some shorts:\t\t", args.hex)
-      #
       chunk = read_and_tell(2) # read next bytes
       seqheader['bars']=struct.unpack("<H",chunk)
       print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", args.hex)
-      #
       chunk = read_and_tell(2)
       seqheader['some_number07']=struct.unpack("<H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number07'], "zero:\t\t\t", args.hex)
-      #
       chunk = read_and_tell(2)
       seqheader['bpm']=struct.unpack("<H",chunk)
       seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divide by 10 and create a tuple again
       print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", args.hex)
       if str(seqheader['bpm'][0]) not in seqfbase:
         print "bpm in filename is different! correct with -c"
-      #
       chunk = read_and_tell(14)
       seqheader['some_number08']=struct.unpack("<7H",chunk) # 3 ints
       if args.verbose:
         # maybe this actually is the end of header boundary?
         print print_chunk(chunk, seqheader['some_number08'], "some zeroes:\t\t", args.hex)
-      #
       chunk = read_and_tell(4)
       seqheader['tempo_map01']=struct.unpack("<2H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['tempo_map01'], "tempo map 01:\t\t", args.hex)
-      #
       chunk = read_and_tell(4)
       seqheader['tempo_map02']=struct.unpack("<2H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
-      #
       print "############### End of header ###############"
       # read to end of file and store in ordinary var
       rest_of_file = f.read()
