@@ -67,9 +67,9 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
   # replace string
   if replaceterm:
     if len(replaceterm) > 16:
-      sys.stderr.write("replaceterm ("+replaceterm+") too long, max chars: 16, exiting.\n")
-      raise SystemExit(4)
-    elif replaceterm=="wav_bpm_replace":
+      print "replaceterm ("+replaceterm+") too long, max chars: 16, truncating!.\n"
+      replaceterm=replaceterm[0:16]
+    if replaceterm=="wav_bpm_replace":
       replaceterm=string_bpm_replace(args.searchterm, seqfile)
       print "!!! replacing FIRST occurence of \""+searchterm+"\" with \""+replaceterm+"\", "
       #print "!!! RUN AGAIN if you have more than 1 Audio track where this should be replaced!"
@@ -117,8 +117,10 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
 
 def replace_part(term):
   #print "DEBUG: replaceterm before splitting: "+term
-  dict={"first": str(term[0:8]).ljust(8, "\x00"),
-        "second": str(term[8:len(term)]).ljust(8, "\x00")}
+  if len(term) > 16:
+    termlength=16
+    dict={"first": str(term[0:8]).ljust(8, "\x00"),
+          "second": str(term[8:termlength]).ljust(8, "\x00")}
   return dict 
 
 def get_wav_first(buf, index):
