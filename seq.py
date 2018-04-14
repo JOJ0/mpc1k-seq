@@ -190,10 +190,11 @@ parser.add_argument("path", help="path of *.SEQ files to be processed")
 parser.add_argument("--search", "-s", help="search for given string in file contents", type=str, dest="searchterm")
 parser.add_argument("--replace", "-r", help="replace SEARCHTERM with REPLACETERM", type=str, dest="replaceterm")
 parser.add_argument("--correct-wav", "-w", help="sets basename of .SEQ file to the place where SEARCHTERM is found. Use this if your seq and wav files are named identically", action="store_true")
-parser.add_argument("--correct-wav-bpm", "-v", help="replace BPM in found SEARCHTERM with BPM found in filename", action="store_true")
+parser.add_argument("--correct-wav-bpm", "-p", help="replace BPM in found SEARCHTERM with BPM found in filename", action="store_true")
 parser.add_argument("--bpm", "-b", help="space seperated BPM list (actually any string in filename will be searched for)", type=str, dest="bpm_list")
 parser.add_argument("--correct-bpm", "-c", help="set BPM to the same as in filename", action="store_true")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
+parser.add_argument("--verbose", "-v", help="also show border markers and not yet studied header information", action="store_true")
 args = parser.parse_args()
 
 if args.replaceterm and not args.searchterm:
@@ -201,11 +202,11 @@ if args.replaceterm and not args.searchterm:
 if args.correct_wav and not args.searchterm:
   parser.error("--correct-wav (-w) does not make sense without --search (-s)")
 if args.correct_wav_bpm and not args.searchterm:
-  parser.error("--correct-wav_bpm (-v) does not make sense without --search (-s)")
+  parser.error("--correct-wav-bpm (-p) does not make sense without --search (-s)")
 if ((args.replaceterm and args.correct_wav)
     or (args.replaceterm and args.correct_wav_bpm)
     or (args.correct_wav and args.correct_wav_bpm)):
-  parser.error("you can either --replace (-r) or --correct-wav (-w) or correct-wav-bpm (-v)")
+  parser.error("you can either --replace (-r) or --correct-wav (-w) or correct-wav-bpm (-p)")
 PATH=args.path
 print "\n* PATH used: " + PATH + ""
 if args.searchterm:
@@ -214,6 +215,8 @@ if args.replaceterm:
   print "* replace is enabled! REPLACETERM is \""+args.replaceterm+"\""
 if args.hex:
   print "* show hex values is enabled"
+if args.verbose:
+  print "* verbose mode is enabled"
 if args.bpm_list:
   bpm_list = args.bpm_list.split(' ')
   print "* bpm_list:\t",  bpm_list
@@ -236,11 +239,13 @@ for seqfile in os.listdir(PATH):
       seqheader={}
       chunk = read_and_tell(2) # read next bytes
       seqheader['some_number01']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number01'], "first 2 bytes\t\t", args.hex)
+      if args.verbose:
+        print print_chunk(chunk, seqheader['some_number01'], "first 2 bytes\t\t", args.hex)
       #
       chunk = read_and_tell(2) # read next bytes
       seqheader['some_number02']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number02'], "zero:\t\t\t", args.hex)
+      if args.verbose:
+        print print_chunk(chunk, seqheader['some_number02'], "zero:\t\t\t", args.hex)
       #
       chunk = read_and_tell(16) # read next bytes
       seqheader['version']=struct.unpack("16s",chunk)
@@ -248,7 +253,8 @@ for seqfile in os.listdir(PATH):
       #
       chunk = read_and_tell(8) # read next bytes
       seqheader['some_number03']=struct.unpack("<4H",chunk)
-      print print_chunk(chunk, seqheader['some_number03'], "some shorts:\t\t", args.hex)
+      if args.verbose:
+        print print_chunk(chunk, seqheader['some_number03'], "some shorts:\t\t", args.hex)
       #
       chunk = read_and_tell(2) # read next bytes
       seqheader['bars']=struct.unpack("<H",chunk)
@@ -256,7 +262,8 @@ for seqfile in os.listdir(PATH):
       #
       chunk = read_and_tell(2)
       seqheader['some_number07']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['some_number07'], "zero:\t\t\t", args.hex)
+      if args.verbose:
+        print print_chunk(chunk, seqheader['some_number07'], "zero:\t\t\t", args.hex)
       #
       chunk = read_and_tell(2)
       seqheader['bpm']=struct.unpack("<H",chunk)
@@ -267,16 +274,19 @@ for seqfile in os.listdir(PATH):
       #
       chunk = read_and_tell(14)
       seqheader['some_number08']=struct.unpack("<7H",chunk) # 3 ints
-      # maybe this actually is the end of header boundary?
-      print print_chunk(chunk, seqheader['some_number08'], "some zeroes:\t\t", args.hex)
+      if args.verbose:
+        # maybe this actually is the end of header boundary?
+        print print_chunk(chunk, seqheader['some_number08'], "some zeroes:\t\t", args.hex)
       #
       chunk = read_and_tell(4)
       seqheader['tempo_map01']=struct.unpack("<2H",chunk)
-      print print_chunk(chunk, seqheader['tempo_map01'], "tempo map 01:\t\t", args.hex)
+      if args.verbose:
+        print print_chunk(chunk, seqheader['tempo_map01'], "tempo map 01:\t\t", args.hex)
       #
       chunk = read_and_tell(4)
       seqheader['tempo_map02']=struct.unpack("<2H",chunk)
-      print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
+      if args.verbose:
+        print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
       #
       print "############### End of header ###############"
       # read to end of file and store in ordinary var
@@ -317,7 +327,7 @@ for seqfile in os.listdir(PATH):
             +"\" with \""+replace_part(seqfbase)["first"]+"\","
           print "**     and \t\t\""+get_wav_second(rest_of_file, foundindex)\
             +"\" with \""+replace_part(seqfbase)["second"]+"\"."
-          print "** --correct-wav-bpm (-v) just replaces the bpm part in the found term," 
+          print "** --correct-wav-bpm (-p) just replaces the bpm part in the found term," 
           print "**     it would replace \""+get_wav_first(rest_of_file, foundindex)\
             +"\" with \""+string_bpm_replace(args.searchterm, seqfile)+"\"."
           print "** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
