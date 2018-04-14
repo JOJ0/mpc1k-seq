@@ -52,13 +52,14 @@ def read_and_tell(to_byte):
 
 def print_chunk(chunk, data,  descr, hexflag=0):
   """print properly formated chunk data"""
-  global bytedec_beg, bytehex_beg, bytedec_end, bytehex_end, chunk2hexgroups
   data_list=""
   data_list=" ".join(map(str,data))
   hexgroup=""
   if hexflag==1: hexgroup="| "+chunk2hexgroups(chunk)+" |"
-  # for now set position output to decimal, FIXME should this be configurable? 
-  return str(bytedec_beg)+"\t"+descr+data_list+"\t"+hexgroup
+  # for now set position output to decimal and include end position
+  # FIXME should this be configurable?
+  #return str(bytedec_beg)+"\t"+descr+data_list+"\t"+hexgroup
+  return str(bytedec_beg)+":"+str(bytedec_end)+"\t"+descr+data_list+"\t"+hexgroup
 
 def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceterm="", bpm_new=0, foundindex=0):
   # strip possible .SEQ ending
