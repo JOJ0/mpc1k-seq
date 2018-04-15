@@ -67,7 +67,7 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
   # replace string
   if replaceterm:
     if len(replaceterm) > 16:
-      print "replaceterm ("+replaceterm+") too long, max chars: 16, truncating!.\n"
+      print "replaceterm ("+replaceterm+") too long, max chars: 16, truncating!\n"
       replaceterm=replaceterm[0:16]
     if replaceterm=="wav_bpm_replace":
       replaceterm=string_bpm_replace(args.searchterm, seqfile)
@@ -77,14 +77,14 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
     elif len(replaceterm) > 8:
       #print "DEBUG: we need to cut REPLACETERM, it's between 8 and 16 chars"
       #print "DEBUG: index:\t"+str(foundindex)
-      print "!!! putting \""+replace_part(replaceterm)["first"]\
+      print "!!! putting \""+term_split(replaceterm)["first"]\
         +"\" where \""+get_wav_first(rest_of_file, foundindex)+"\", "
       rest_of_file=rest_of_file.replace(get_wav_first(rest_of_file, foundindex),\
-        replace_part(replaceterm)["first"], 1)
-      print "!!! putting \""+replace_part(replaceterm)["second"]+"\" where \""\
+        term_split(replaceterm)["first"], 1)
+      print "!!! putting \""+term_split(replaceterm)["second"]+"\" where \""\
         +get_wav_second(rest_of_file, foundindex)+"\", "
       rest_of_file=rest_of_file.replace(get_wav_second(rest_of_file, foundindex),\
-        replace_part(replaceterm)["second"], 1)
+        term_split(replaceterm)["second"], 1)
     else:
       #print "DEBUG: replaceterm is max 8 chars long, just replacing"
       print "!!! replacing FIRST occurence of \""+searchterm+"\" with \""+replaceterm+"\", "
@@ -115,12 +115,13 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
     fw.write(bytestring)
     fw.close()
 
-def replace_part(term):
+def term_split(term):
   #print "DEBUG: replaceterm before splitting: "+term
-  if len(term) > 16:
-    termlength=16
-    dict={"first": str(term[0:8]).ljust(8, "\x00"),
-          "second": str(term[8:termlength]).ljust(8, "\x00")}
+  dict={}
+  if len(term) > 16: termlength=16
+  else: termlength=len(term)
+  dict={"first": str(term[0:8]).ljust(8, "\x00"),
+        "second": str(term[8:termlength]).ljust(8, "\x00")}
   return dict 
 
 def get_wav_first(buf, index):
@@ -135,8 +136,14 @@ def get_wav_second(buf, index):
 
 def string_bpm_replace(term_one, term_two):
   """replaces term_ones bpm with bpm found in term_two"""
-  return term_one.replace(bpmfind(term_one, leading_zero=True), 
-          bpmfind(term_two, leading_zero=True))
+  if term_two == "0":
+    print "no bpm to replace found!!!"
+    return ""
+  else:
+    #print "DEBUG: string_replace_bpm term_one: "+term_one
+    #print "DEBUG: string_replace_bpm term_two: "+term_two
+    return term_one.replace(bpmfind(term_one, leading_zero=True), 
+            bpmfind(term_two, leading_zero=True))
 
 def stringsearch(rest_of_file, searchterm):
   length=len(searchterm)
@@ -163,6 +170,7 @@ def stringsearch(rest_of_file, searchterm):
 def bpmfind(sometext, leading_zero=False):
   """finds possible bpm values in strings"""
   """leading_zero=True returns string instead of int!"""
+  #print "DEBUG: bpmfind looking for bpm in: "+sometext
   bpm=0
   splitted=sometext.split("_")
   for i in splitted:
@@ -170,20 +178,24 @@ def bpmfind(sometext, leading_zero=False):
       if int(i) > 49:
         bpm=int(i)
         if leading_zero==False:
-          print "found underscore seperated bpm value in filename: "+str(bpm)
+          print "-> found underscore seperated bpm value in given term: "+str(bpm)
   # if we still dont have a possible bpm value, continue with dash search
   if bpm==0:
+    #print "DEBUG: still no bpm, before - dash search"
     splitted=sometext.split("-")
     for i in splitted:
+      i#print "DEBUG: inside dash search loop: "+i
       if i.isdigit():
         if int(i) > 49:
+          #print "DEBUG: bpm found, it's > 49: "+i
           bpm=int(i)
           if leading_zero==False:
-            print "found dash seperated bpm value in filename: "+str(bpm)
+            print "-> found dash seperated bpm value in given term: "+str(bpm)
   # if we still dont have a bpm value, give up!
   if bpm==0:
-    print "didn't find a possible bpm value in filename, "
-    print "use underscores or dashed as seperating characters"
+    print "?? didn't find a possible bpm value in given term ("+sometext+"),"
+    print "?? use underscores or dashes as seperating characters!"
+    print "?? replace options --bpm-correct and --correct-wav-bpm won't work! "
   if leading_zero==True:
     return str(bpm).zfill(3)
   else:
@@ -234,7 +246,9 @@ print "" # just some space
 
 for seqfile in os.listdir(PATH):
   if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
-    print "############### "+seqfile+" ################"
+    header_start_border="################## "+seqfile+" ###################"
+    #print len(header_start_border)
+    print (header_start_border)
     with open(PATH+"/"+seqfile, "rb") as f:
       seqfbase=seqfile.replace(".SEQ", "")
       #chunk = f.read(47) # read up to end of header 0x002f
@@ -318,11 +332,11 @@ for seqfile in os.listdir(PATH):
           print "** --replace simply replaces "+args.searchterm+" with REPLACETERM." 
           print "** --correct-wav (-w) puts this files basename at found terms position,"
           print "**     it would replace \""+get_wav_first(rest_of_file, foundindex)\
-            +"\" with \""+replace_part(seqfbase)["first"]+"\","
+            +"\" with \""+term_split(seqfbase)["first"]+"\","
           print "**     and \t\t\""+get_wav_second(rest_of_file, foundindex)\
-            +"\" with \""+replace_part(seqfbase)["second"]+"\"."
+            +"\" with \""+term_split(seqfbase)["second"]+"\"."
           print "** --correct-wav-bpm (-p) just replaces the bpm part in the found term," 
-          print "**     it would replace \""+get_wav_first(rest_of_file, foundindex)\
+          print "**     it would replace \""+args.searchterm\
             +"\" with \""+string_bpm_replace(args.searchterm, seqfile)+"\"."
           print "** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
           if args.correct_bpm:
