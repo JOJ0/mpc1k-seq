@@ -5,7 +5,8 @@ I often use MPC1000 as a backing track loop player. I have the same drum loops i
 
 ```
 usage: seq.py [-h] [--search SEARCHTERM] [--replace REPLACETERM]
-              [--bpm BPM_LIST] [--correct-bpm] [--hex]
+              [--correct-wav] [--correct-wav-bpm] [--bpm BPM_LIST]
+              [--correct-bpm] [--hex] [--verbose]
               path
 
 positional arguments:
@@ -17,11 +18,19 @@ optional arguments:
                         search for given string in file contents
   --replace REPLACETERM, -r REPLACETERM
                         replace SEARCHTERM with REPLACETERM
+  --correct-wav, -w     sets basename of .SEQ file to the place where
+                        SEARCHTERM is found. Use this if your seq and wav
+                        files are named identically
+  --correct-wav-bpm, -p
+                        replace BPM in found SEARCHTERM with BPM found in
+                        filename
   --bpm BPM_LIST, -b BPM_LIST
-                        space separated BPM list (actually any string in
+                        space seperated BPM list (actually any string in
                         filename will be searched for)
   --correct-bpm, -c     set BPM to the same as in filename
   --hex, -x             show hex values next to decimal and strings
+  --verbose, -v         also show border markers and not yet studied header
+                        information
 ```
 
 ## examples
