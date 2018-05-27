@@ -207,7 +207,7 @@ parser.add_argument("--search", "-s", help="search for given string in file cont
 parser.add_argument("--replace", "-r", help="replace SEARCHTERM with REPLACETERM", type=str, dest="replaceterm")
 parser.add_argument("--correct-wav", "-w", help="sets basename of .SEQ file to the place where SEARCHTERM is found. Use this if your seq and wav files are named identically", action="store_true")
 parser.add_argument("--correct-wav-bpm", "-p", help="replace BPM in found SEARCHTERM with BPM found in filename", action="store_true")
-parser.add_argument("--bpm", "-b", help="space seperated BPM list (actually any string in filename will be searched for)", type=str, dest="bpm_list")
+parser.add_argument("--filter", "--bpm", "-b", help="historically was used as a space seperated BPM list but actually it is a simple filter: only filenames containing one of the strings in the list, will be processed", type=str, dest="bpm_list")
 parser.add_argument("--correct-bpm", "-c", help="set BPM to the same as in filename", action="store_true")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
 parser.add_argument("--verbose", "-v", help="also show border markers and not yet studied header information", action="store_true")

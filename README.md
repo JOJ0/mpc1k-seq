@@ -5,7 +5,7 @@ I often use my MPC1000 as a backing track loop player. For example I export the 
 
 ```
 usage: seq.py [-h] [--search SEARCHTERM] [--replace REPLACETERM]
-              [--correct-wav] [--correct-wav-bpm] [--bpm BPM_LIST]
+              [--correct-wav] [--correct-wav-bpm] [--filter BPM_LIST]
               [--correct-bpm] [--hex] [--verbose]
               path
 
@@ -24,18 +24,20 @@ optional arguments:
   --correct-wav-bpm, -p
                         replace BPM in found SEARCHTERM with BPM found in
                         filename
-  --bpm BPM_LIST, -b BPM_LIST
-                        space seperated BPM list (actually any string in
-                        filename will be searched for)
+  --filter BPM_LIST, --bpm BPM_LIST, -b BPM_LIST
+                        historically was used as a space seperated BPM list
+                        but actually it is a simple filter: only filenames
+                        containing one of the strings in the list, will be
+                        processed
   --correct-bpm, -c     set BPM to the same as in filename
   --hex, -x             show hex values next to decimal and strings
   --verbose, -v         also show border markers and not yet studied header
                         information
 ```
 
-## examples
+## simple usage examples
 
-just show meta information of all seq files in current folder
+just show meta information of all seq files in current directory
 ```
 seq.py .
 ```
@@ -52,21 +54,157 @@ search for a string
 ```
 seq.py -b "64 512" -x -s "FunkBG" .
 ```
-replace SEARCHTERM with REPLACETERM
+replace _first occurence_ of SEARCHTERM with REPLACETERM (run script again to replace next instance of SEARCHTERM)
+
+FIXME - "replacecount" may be configurable in future releases
 ```
 seq.py -b "64 512" -x -s "FunkBG" -r "Blues01" .
 ```
 
 
-## output example
+## a more detailed usage example
 
-show all SEQ files in current directory that have 80 in the filename and search for the term FunkBG
+Show all 80 bpm SEQ files in current directory and search for the term "FunkBG" in the file:
 
 ```
 seq.py -b "80" -s FunkBG .
 ```
 
-output:
+Usually this is useful if we would like to search and replace a wav files name in an audio track, but certainly also could use it to replace the name of an MPC "program file" (.pgm) somewhere in the (binary) seq file. 
+
+Another note: Actually the option -b "TERM" (or --bpm "TERM") is only a simple search for a string in the sequence files _filename_. I personally use to track my files bpm in the filename, that's why I called the option --bpm.
+
+The command's output is first showing us general meta data like the version of the sequence file, the number of bars and the bpm of the sequence.
+
+After the "End of header" marker we see that it found our searchterm "FunkBG". If you are using the script like I do, you probably would like to replace the name of the wav file configured into the seq file (or only a part of it). The name of a wav file oddly is saved in two 8 Byte chunks in different places. The script is trying to help us with finding out if it just found part of a wav file name or something else (like a pgm file name or some other string).
+
+Next are our possibilities to replace that string:
+
+--replace (-r) is the simplest form of replacement and shoudld be self-explanatory.
+
+--correct-wav (-w) is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the test seq file from the repo this wav and seq file names where identically already so this option currently also does not make much sense.
+
+--correct-wav-bpm (-p) ist not applicable in this case. I'll show it in another example.
+
+Each of the options exactely state what they would replace, so if we are happy with one of them we just rerun the script and additionally add the replace option to the command line.
+
+```
+* PATH used: .
+* searching for "FunkBG" (after End of header)
+* bpm_list: ['80']
+
+################## FunkBG_080_8bar.SEQ ###################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:       "FunkBG_0"
+and this would be the second half:  "80_8bar"
+** REPLACE OPTIONS: *************************************
+** --replace simply replaces FunkBG with REPLACETERM.
+** --correct-wav (-w) puts this files basename at found terms position,
+**     it would replace "FunkBG_0" with "FunkBG_0",
+**     and              "80_8bar" with "80_8bar".
+** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
+?? didn't find a possible bpm value in given term (FunkBG),
+?? use underscores or dashes as seperating characters!
+?? replace options --bpm-correct and --correct-wav-bpm won't work!
+**     it would replace "FunkBG" with "FunkBG".
+** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
+```
+
+For example if we choose -r to be the wanted option because we want to replace "FunkBG" with "Punk__", this would be the resulting output
+
+```
+seq.py -b "80" -s FunkBG -r "PunkBG" .
+
+* PATH used: .
+* searching for "FunkBG" (after End of header)
+* replace is enabled! REPLACETERM is "PunkBG"
+* bpm_list: ['80']
+
+################## FunkBG_080_8bar.SEQ ###################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:     8
+32:34 bpm:      80
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:   "FunkBG_0"
+and this would be the second half:  "80_8bar"
+!!! replacing FIRST occurence of "FunkBG" with "PunkBG",
+!!! and overwriting ./FunkBG_080_8bar.SEQ ...
+```
+
+If we now search for FunkBG again we certainly won't find it anymore:
+
+```
+seq.py -b "80" -s "FunkBG" .
+
+* PATH used: .
+* searching for "FunkBG" (after End of header)
+* bpm_list: ['80']
+
+################## FunkBG_080_8bar.SEQ ###################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:     8
+32:34 bpm:      80
+############### End of header ###############
+your SEARCHTERM "FunkBG" was not found!
+```
+
+Punk would instead be found and we would have similar options as with our first search above:
+
+```
+seq.py -b "80" -s "Punk" .
+
+* PATH used: .
+* searching for "Punk" (after End of header)
+* bpm_list: ['80']
+
+################## FunkBG_080_8bar.SEQ ###################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 4 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:       "PunkBG_0"
+and this would be the second half:  "80_8bar"
+** REPLACE OPTIONS: *************************************
+** --replace simply replaces Punk with REPLACETERM.
+** --correct-wav (-w) puts this files basename at found terms position,
+**     it would replace "PunkBG_0" with "FunkBG_0",
+**     and    "80_8bar" with "80_8bar".
+** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
+?? didn't find a possible bpm value in given term (Punk),
+?? use underscores or dashes as seperating characters!
+?? replace options --bpm-correct and --correct-wav-bpm won't work!
+**     it would replace "Punk" with "Punk".
+** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
+```
+
+
+## another more sophisticated example
+
+This is the use case I actually wrote this script for. Let's take the file from above example where we had replaced Funk with Punk, but let's copy and _rename_ them. You can do the copy- and renaming however you like, eg iOS X Finder has a nice mass renaming tool built-in. I do it directly on the comandline now, while we are at it:
+
+
+```
+cp FunkBG_080_8bar.SEQ PunkBG_080_8bar.SEQ
+cp FunkBG_080_8bar.SEQ PunkBG_090_8bar.SEQ
+cp FunkBG_080_8bar.SEQ PunkBG_100_8bar.SEQ
+rm FunkBG_080_8bar.SEQ
+```
+
+Ok now we'd like to set the wav files name in all of the 3 "Punk sequence files" to the same as the filename. We first search for Punk and see what we have. Probably there are other seq files in this folder so we particularily select our 3 files with the -b option:
+
 
 ```
 ```
+
+
+
+
