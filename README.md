@@ -42,7 +42,7 @@ just show meta information of all seq files in current directory
 seq.py .
 ```
 
-show info of all seqfile that have 64 and 512 in the filename (usually BPM values)
+show info of all seq files that have 64 or 512 in the filename (usually BPM values)
 ```
 seq.py -b "64 512" .
 ```
@@ -64,15 +64,13 @@ seq.py -b "64 512" -x -s "FunkBG" -r "Blues01" .
 
 ## a more detailed usage example
 
-Show all 80 bpm SEQ files in current directory and search for the term "FunkBG" in the file:
+Show all .SEQ files in the current directory (.) that have 80 in the filename (-b "80" or --filter "80" and search for the term "FunkBG" in the file:
 
 ```
 seq.py -b "80" -s FunkBG .
 ```
 
-Usually this is useful if we would like to search and replace a wav files name in an audio track, but certainly also could use it to replace the name of an MPC "program file" (.pgm) somewhere in the (binary) seq file. 
-
-Another note: Actually the option -b "TERM" (or --bpm "TERM") is only a simple search for a string in the sequence files _filename_. I personally use to track my files bpm in the filename, that's why I called the option --bpm.
+Usually this is useful if we would like to search and replace a wav files name in an audio track, but certainly also could use it to replace the name of an MPC "program file" (.PGM) somewhere in the (binary) seq file.
 
 The command's output is first showing us general meta data like the version of the sequence file, the number of bars and the bpm of the sequence.
 
@@ -132,13 +130,13 @@ seq.py -b "80" -s FunkBG -r "PunkBG" .
 ############### End of header ###############
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
-this would be the first half:   "FunkBG_0"
+this would be the first half:       "FunkBG_0"
 and this would be the second half:  "80_8bar"
 !!! replacing FIRST occurence of "FunkBG" with "PunkBG",
 !!! and overwriting ./FunkBG_080_8bar.SEQ ...
 ```
 
-If we now search for FunkBG again we certainly won't find it anymore:
+If we now search for FunkBG again, we certainly won't find it anymore:
 
 ```
 seq.py -b "80" -s "FunkBG" .
@@ -155,7 +153,7 @@ seq.py -b "80" -s "FunkBG" .
 your SEARCHTERM "FunkBG" was not found!
 ```
 
-Punk would instead be found and we would have similar options as with our first search above:
+PunkBG would instead be found and we would have similar options as with our first search above:
 
 ```
 seq.py -b "80" -s "Punk" .
@@ -189,22 +187,101 @@ and this would be the second half:  "80_8bar"
 
 ## another more sophisticated example
 
-This is the use case I actually wrote this script for. Let's take the file from above example where we had replaced Funk with Punk, but let's copy and _rename_ them. You can do the copy- and renaming however you like, eg iOS X Finder has a nice mass renaming tool built-in. I do it directly on the comandline now, while we are at it:
+This is the use case I actually wrote this script for. Let's take the file from above example where we had replaced Funk with Punk, but let's copy and _rename_ them. You can do the copy- and renaming however you like, eg iOS X Finder has a nice mass renaming tool built-in. I do it directly on the commandline now, while we are at it:
 
 
 ```
 cp FunkBG_080_8bar.SEQ PunkBG_080_8bar.SEQ
 cp FunkBG_080_8bar.SEQ PunkBG_090_8bar.SEQ
 cp FunkBG_080_8bar.SEQ PunkBG_100_8bar.SEQ
-rm FunkBG_080_8bar.SEQ
 ```
 
-Ok now we'd like to set the wav files name in all of the 3 "Punk sequence files" to the same as the filename. We first search for Punk and see what we have. Probably there are other seq files in this folder so we particularily select our 3 files with the -b option:
+Ok now we'd like to set the wav files name in all of the 3 "Punk sequence files" to the same as the filename. We first search for Punk and see what we have. Probably there are other seq files in this folder so we particularily select our 3 files with the --filter (-b) option:
 
+
+```
+seq.py --filter Punk -s "PunkBG" .
+
+* PATH used: .
+* searching for "PunkBG" (after End of header)
+* bpm_list:	['Punk']
+
+################## PunkBG_080_8bar.SEQ ###################
+4:20	version:		MPC1000 SEQ 4.40
+28:30	bars:			8
+32:34	bpm:			80
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:				"PunkBG_0"
+and this would be the second half:	"80_8bar"
+** REPLACE OPTIONS: *************************************
+** --replace simply replaces PunkBG with REPLACETERM.
+** --correct-wav (-w) puts this files basename at found terms position,
+**     it would replace "PunkBG_0" with "PunkBG_0",
+**     and 							"80_8bar" with "80_8bar".
+** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
+?? didn't find a possible bpm value in given term (PunkBG),
+?? use underscores or dashes as seperating characters!
+?? replace options --bpm-correct and --correct-wav-bpm won't work!
+**     it would replace "PunkBG" with "PunkBG".
+** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
+
+
+################## PunkBG_090_8bar.SEQ ###################
+4:20	version:		MPC1000 SEQ 4.40
+28:30	bars:			8
+32:34	bpm:			80
+bpm in filename is different! correct with -c
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:				"PunkBG_0"
+and this would be the second half:	"80_8bar"
+** REPLACE OPTIONS: *************************************
+** --replace simply replaces PunkBG with REPLACETERM.
+** --correct-wav (-w) puts this files basename at found terms position,
+**     it would replace "PunkBG_0" with "PunkBG_0",
+**     and 							"80_8bar" with "90_8bar".
+** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
+?? didn't find a possible bpm value in given term (PunkBG),
+?? use underscores or dashes as seperating characters!
+?? replace options --bpm-correct and --correct-wav-bpm won't work!
+**     it would replace "PunkBG" with "PunkBG".
+** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
+
+
+################## PunkBG_100_8bar.SEQ ###################
+4:20	version:		MPC1000 SEQ 4.40
+28:30	bars:			8
+32:34	bpm:			80
+bpm in filename is different! correct with -c
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:				"PunkBG_0"
+and this would be the second half:	"80_8bar"
+** REPLACE OPTIONS: *************************************
+** --replace simply replaces PunkBG with REPLACETERM.
+** --correct-wav (-w) puts this files basename at found terms position,
+**     it would replace "PunkBG_0" with "PunkBG_1",
+**     and 							"80_8bar" with "00_8bar".
+** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
+?? didn't find a possible bpm value in given term (PunkBG),
+?? use underscores or dashes as seperating characters!
+?? replace options --bpm-correct and --correct-wav-bpm won't work!
+**     it would replace "PunkBG" with "PunkBG".
+** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
+```
+
+If we closely look at the output for the 3 files we'd find these differencies
+
+  * the bpm of the sequence can be corrected in files 2 and 3
+  * --correct-wav (-w) could replace the name of the wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
+
+If we would use the -w option we would get this
 
 ```
 ```
 
-
-
-
+...FIXME
