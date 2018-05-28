@@ -281,8 +281,10 @@ for seqfile in os.listdir(PATH):
       seqheader['bpm']=struct.unpack("<H",chunk)
       seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divide by 10 and create a tuple again
       print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", args.hex)
-      if str(seqheader['bpm'][0]) not in seqfbase:
-        print "bpm in filename is different! correct with -c"
+      if str(seqheader['bpm'][0]) not in seqfbase and args.correct-bpm:
+        print "bpm in filename is different! This will be fixed now!"
+      elif str(seqheader['bpm'][0]) not in seqfbase:
+        print "bpm in filename is different! Correct with --correct-bpm (-c)"
       chunk = read_and_tell(14)
       seqheader['some_number08']=struct.unpack("<7H",chunk) # 3 ints
       if args.verbose:
