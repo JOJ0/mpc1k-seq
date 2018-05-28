@@ -276,13 +276,68 @@ and this would be the second half:	"80_8bar"
 
 If we closely look at the output for the 3 files we'd find these differencies
 
-  * the bpm of the sequence can be corrected in files 2 and 3
+  * -c could correct the bpm of the sequence in files 2 and 3 (the copies)
   * --correct-wav (-w) could replace the name of the wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
 
-If we would use the -w option we would get this
+If we would now use options -w and -c option we would get the following output
 
 ```
-*asdgfasd*
+seq.py --filter Punk -s "PunkBG" -w -c
+
+* PATH used: .
+* searching for "PunkBG" (after End of header)
+* bpm_list: ['Punk']
+* bpm-correct is enabled!
+* correct-wav is enabled!
+
+################## PunkBG_080_8bar.SEQ ###################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:     8
+32:34 bpm:      80
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:       "PunkBG_0"
+and this would be the second half:  "80_8bar"
+-> found underscore seperated bpm value in given term: 80
+!!! putting "PunkBG_0" where "PunkBG_0",
+!!! putting "80_8bar" where "80_8bar",
+!!! replacing bpm value,
+!!! and overwriting ./PunkBG_080_8bar.SEQ ...
+
+
+################## PunkBG_090_8bar.SEQ ###################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:     8
+32:34 bpm:      80
+bpm in filename is different! correct with -c
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:       "PunkBG_0"
+and this would be the second half:  "80_8bar"
+-> found underscore seperated bpm value in given term: 90
+!!! putting "PunkBG_0" where "PunkBG_0",
+!!! putting "90_8bar" where "80_8bar",
+!!! replacing bpm value,
+!!! and overwriting ./PunkBG_090_8bar.SEQ ...
+
+
+################## PunkBG_100_8bar.SEQ ###################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:     8
+32:34 bpm:      80
+bpm in filename is different! correct with -c
+############### End of header ###############
+Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
+If SEARCHTERM is the START of a wav filename in an Audio Track,
+this would be the first half:       "PunkBG_0"
+and this would be the second half:  "80_8bar"
+-> found underscore seperated bpm value in given term: 100
+!!! putting "PunkBG_1" where "PunkBG_0",
+!!! putting "00_8bar" where "80_8bar",
+!!! replacing bpm value,
+!!! and overwriting ./PunkBG_100_8bar.SEQ ...
 ```
 
 ...FIXME
