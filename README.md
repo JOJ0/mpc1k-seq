@@ -187,7 +187,7 @@ and this would be the second half:  "80_8bar"
 
 ## Another more sophisticated example
 
-This is the use case I actually wrote this script for. Let's take the file from above example where we had replaced Funk with Punk, but let's copy and _rename_ them. You can do the copy- and renaming however you like, eg iOS X Finder has a nice mass renaming tool built-in. I do it directly on the commandline now, while we are at it:
+This is the use case I actually wrote this script for. Let's take the file from above example where we had replaced Funk with Punk, but let's copy and _rename_ them. You can do the copy/renaming however you like, eg iOS X Finder has a nice mass renaming tool built-in. I do it directly on the commandline now, while we are at it:
 
 
 ```
