@@ -175,7 +175,7 @@ and this would be the second half:  "80_8bar"
 ** --replace simply replaces Punk with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "FunkBG_0",
-**     and    "80_8bar" with "80_8bar".
+**     and              "80_8bar" with "80_8bar".
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (Punk),
 ?? use underscores or dashes as seperating characters!
@@ -213,13 +213,13 @@ seq.py --filter Punk -s "PunkBG" .
 ############### End of header ###############
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
-this would be the first half:				"PunkBG_0"
-and this would be the second half:	"80_8bar"
+this would be the first half:       "PunkBG_0"
+and this would be the second half:  "80_8bar"
 ** REPLACE OPTIONS: *************************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
-**     and 							"80_8bar" with "80_8bar".
+**     and              "80_8bar" with "80_8bar".
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
@@ -236,13 +236,13 @@ bpm in filename is different! correct with -c
 ############### End of header ###############
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
-this would be the first half:				"PunkBG_0"
+this would be the first half:		"PunkBG_0"
 and this would be the second half:	"80_8bar"
 ** REPLACE OPTIONS: *************************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
-**     and 							"80_8bar" with "90_8bar".
+**     and              "80_8bar" with "90_8bar".
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
@@ -259,13 +259,13 @@ bpm in filename is different! correct with -c
 ############### End of header ###############
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
-this would be the first half:				"PunkBG_0"
+this would be the first half:		"PunkBG_0"
 and this would be the second half:	"80_8bar"
 ** REPLACE OPTIONS: *************************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_1",
-**     and 							"80_8bar" with "00_8bar".
+**     and              "80_8bar" with "00_8bar".
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
@@ -282,6 +282,9 @@ If we closely look at the output for the 3 files we'd find these differencies
 If we would use the -w option we would get this
 
 ```
+*asdgfasd*
 ```
 
 ...FIXME
+
+
