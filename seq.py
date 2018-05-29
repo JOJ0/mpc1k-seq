@@ -346,7 +346,7 @@ for seqfile in os.listdir(PATH):
           writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
         # only print this if we found something but are NOT replacing it already
         elif foundindex >0:
-          print "** REPLACE OPTIONS: *************************************"
+          print "** REPLACE OPTIONS: ********************************"
           print "** --replace simply replaces "+args.searchterm+" with REPLACETERM." 
           print "** --correct-wav (-w) puts this files basename at found terms position,"
           print "**     it would replace \""+get_wav_first(rest_of_file, foundindex)\

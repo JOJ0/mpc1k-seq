@@ -91,11 +91,6 @@ Each of the options exactely state what they would replace, so if we are happy w
 * searching for "FunkBG" (after End of header)
 * bpm_list: ['80']
 
-################## FunkBG_080_8bar.SEQ ###################
-4:20  version:    MPC1000 SEQ 4.40
-28:30 bars:       8
-32:34 bpm:        80
-############### End of header ###############
 ############### FunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
 28:30 bars:       8
@@ -105,7 +100,7 @@ Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "FunkBG_0"
 and this would be the second half:  "80_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces FunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "FunkBG_0" with "FunkBG_0",
@@ -118,7 +113,7 @@ and this would be the second half:  "80_8bar"
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
 
-For example if we choose -r to be the wanted option because we want to replace "FunkBG" with "Punk__", this would be the resulting output
+For example if we choose -r to be the wanted option because we want to replace "FunkBG" with "FunkBG", this would be the resulting output
 
 ```
 seq.py -b "80" -s FunkBG -r "PunkBG" .
@@ -128,11 +123,11 @@ seq.py -b "80" -s FunkBG -r "PunkBG" .
 * replace is enabled! REPLACETERM is "PunkBG"
 * bpm_list: ['80']
 
-################## FunkBG_080_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      80
-############### End of header ###############
+############### FunkBG_080_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "FunkBG_0"
@@ -150,15 +145,15 @@ seq.py -b "80" -s "FunkBG" .
 * searching for "FunkBG" (after End of header)
 * bpm_list: ['80']
 
-################## FunkBG_080_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      80
-############### End of header ###############
+############### FunkBG_080_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+################## End of header ###################
 your SEARCHTERM "FunkBG" was not found!
 ```
 
-PunkBG would instead be found and we would have similar options as with our first search above:
+Punk would instead be found and we _would have_ similar options as with our first search above:
 
 ```
 seq.py -b "80" -s "Punk" .
@@ -167,16 +162,16 @@ seq.py -b "80" -s "Punk" .
 * searching for "Punk" (after End of header)
 * bpm_list: ['80']
 
-################## FunkBG_080_8bar.SEQ ###################
+############### FunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
 28:30 bars:       8
 32:34 bpm:        80
-############### End of header ###############
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 4 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces Punk with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "FunkBG_0",
@@ -211,16 +206,16 @@ seq.py --filter Punk -s "PunkBG" .
 * searching for "PunkBG" (after End of header)
 * bpm_list:	['Punk']
 
-################## PunkBG_080_8bar.SEQ ###################
-4:20	version:  MPC1000 SEQ 4.40
-28:30	bars:     8
-32:34	bpm:      80
-############### End of header ###############
+############### PunkBG_080_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
@@ -233,17 +228,17 @@ and this would be the second half:  "80_8bar"
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
 
-################## PunkBG_090_8bar.SEQ ###################
-4:20	version:  MPC1000 SEQ 4.40
-28:30	bars:     8
-32:34	bpm:      80
+############### PunkBG_090_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
 bpm in filename is different! correct with -c
-############### End of header ###############
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:		"PunkBG_0"
 and this would be the second half:	"80_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
@@ -256,17 +251,17 @@ and this would be the second half:	"80_8bar"
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
 
-################## PunkBG_100_8bar.SEQ ###################
-4:20	version:  MPC1000 SEQ 4.40
-28:30	bars:     8
-32:34	bpm:      80
+############### PunkBG_100_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
 bpm in filename is different! correct with -c
-############### End of header ###############
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:		"PunkBG_0"
 and this would be the second half:	"80_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_1",
@@ -279,12 +274,12 @@ and this would be the second half:	"80_8bar"
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
 
-If we closely look at the output for the 3 files we'd find these differencies
+If we closely examine the output for the 3 files we'd find these useful possibilities
 
-  * -c could correct the bpm of the sequence in files 2 and 3 (the copies)
-  * --correct-wav (-w) could replace the name of the wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
+  * --bpm-correct (-c) could correct the bpm of the sequence in files 2 and 3 (the copies)
+  * --correct-wav (-w) could replace the name of the Audio Tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
 
-If we would now use options -w and -c option we would get the following output
+If we would now use options -w and -c option we are getting the following output:
 
 ```
 seq.py --filter Punk -s "PunkBG" -w -c
@@ -295,11 +290,11 @@ seq.py --filter Punk -s "PunkBG" -w -c
 * bpm-correct is enabled!
 * correct-wav is enabled!
 
-################## PunkBG_080_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      80
-############### End of header ###############
+############### PunkBG_080_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_0"
@@ -311,12 +306,12 @@ and this would be the second half:  "80_8bar"
 !!! and overwriting ./PunkBG_080_8bar.SEQ ...
 
 
-################## PunkBG_090_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      80
-bpm in filename is different!  This will be fixed now!
-############### End of header ###############
+############### PunkBG_090_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+bpm in filename is different! This will be fixed now!
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_0"
@@ -328,12 +323,12 @@ and this would be the second half:  "80_8bar"
 !!! and overwriting ./PunkBG_090_8bar.SEQ ...
 
 
-################## PunkBG_100_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      80
+############### PunkBG_100_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
 bpm in filename is different! This will be fixed now!
-############### End of header ###############
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_0"
@@ -345,7 +340,7 @@ and this would be the second half:  "80_8bar"
 !!! and overwriting ./PunkBG_100_8bar.SEQ ...
 ```
 
-A last check shows us that the wav file name and also the bpm have been corrected 
+A last check shows us that the wav file name and also the bpm have been corrected: 
 
 ```
 seq.py --filter Punk -s "PunkBG" .
@@ -354,16 +349,16 @@ seq.py --filter Punk -s "PunkBG" .
 * searching for "PunkBG" (after End of header)
 * bpm_list: ['Punk']
 
-################## PunkBG_080_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      80
-############### End of header ###############
+############### PunkBG_080_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
@@ -376,16 +371,16 @@ and this would be the second half:  "80_8bar"
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
 
-################## PunkBG_090_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      90
-############### End of header ###############
+############### PunkBG_090_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        90
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "90_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
@@ -398,16 +393,16 @@ and this would be the second half:  "90_8bar"
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
 
-################## PunkBG_100_8bar.SEQ ###################
-4:20  version:  MPC1000 SEQ 4.40
-28:30 bars:     8
-32:34 bpm:      100
-############### End of header ###############
+############### PunkBG_100_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        100
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "PunkBG_1"
 and this would be the second half:  "00_8bar"
-** REPLACE OPTIONS: *************************************
+** REPLACE OPTIONS: ********************************
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_1" with "PunkBG_1",
