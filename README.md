@@ -96,6 +96,11 @@ Each of the options exactely state what they would replace, so if we are happy w
 28:30 bars:       8
 32:34 bpm:        80
 ############### End of header ###############
+############### FunkBG_080_8bar.SEQ ################
+4:20  version:    MPC1000 SEQ 4.40
+28:30 bars:       8
+32:34 bpm:        80
+################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
 If SEARCHTERM is the START of a wav filename in an Audio Track,
 this would be the first half:       "FunkBG_0"

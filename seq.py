@@ -244,11 +244,27 @@ if args.correct_wav_bpm:
   print "* correct-wav-bpm is enabled!"
 print "" # just some space
 
+def header_delimiter(position, seqfile):
+  maxlength=50
+  j=0
+  delim=""
+  if position=="end":
+    seqfile="End of header"
+  namelength=len(seqfile)
+  missing=maxlength-namelength
+  #print "missing to maxlength:", missing
+  #print "half of missing:", missing/2
+  while j < missing/2:
+    delim=delim+"#"
+    j+=1
+  line=delim+" "+seqfile+" "+delim 
+  if missing % 2 != 0:
+    line=line+"#"
+  return line
+
 for seqfile in os.listdir(PATH):
   if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
-    header_start_border="################## "+seqfile+" ###################"
-    #print len(header_start_border)
-    print (header_start_border)
+    print header_delimiter("start", seqfile)
     with open(PATH+"/"+seqfile, "rb") as f:
       seqfbase=seqfile.replace(".SEQ", "")
       #chunk = f.read(47) # read up to end of header 0x002f
@@ -298,7 +314,7 @@ for seqfile in os.listdir(PATH):
       seqheader['tempo_map02']=struct.unpack("<2H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
-      print "############### End of header ###############"
+      print header_delimiter("end", seqfile)
       # read to end of file and store in ordinary var
       rest_of_file = f.read()
       # debug print binary
