@@ -113,7 +113,7 @@ and this would be the second half:  "80_8bar"
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
 
-For example if we choose -r to be the wanted option because we want to replace "FunkBG" with "FunkBG", this would be the resulting output
+For example if we chose -r to be the option to use, because we want to simply replace "FunkBG" with "PunkBG", this would be the resulting output
 
 ```
 seq.py -b "80" -s FunkBG -r "PunkBG" .
