@@ -1,9 +1,18 @@
 # mpc1k-seq
 AKAI MPC 1000 sequence file command line utility
 
-I often use my MPC1000 as a backing track loop player. For example I export the same drum loop in different speeds out of a DAW. Creating all the sequence files on the MPC itself is a very tedious task, This utility shows meta information of sequence files and helps doing repititive tasks like replacing the filename in the Audio tracks or replace BPM values.
+I often use my MPC 1000 as a player for backing tracks or drum loops when practicing music or just quickly want something to jam along. I usually create a drum loop in my DAW of choice and then export several wav files in different speeds. I would then copy those files on to my MPC and save one sequence for each wav file. The next time I want to practice or jam I just have to quickly load a folder of sequence and wav files and can easily switch between several speeds.
+
+Creating all the sequences on the MPC itself is a very tedious task, that's why I wrote this tool. I now just have to create one "template sequence" on the MPC, copy it over to the Computer, and create several (renamed) files from it. I then let the tool help me show meta information of the sequence files and do repititive tasks like replacing the filename in the audio tracks or replacing the sequences bpm values.
+
+Though I wrote it for sequence files created from a MPC 1000 running JJOS, I assume it would work with the MPC 2500's files as well, I think they share the same format. Maybe also one's from the MPC 500 would work, not sure about that. I'd certainly appreciate any testing and feedback about usage for those MPC models.
+
+The utility is written in Python and was tested with version 2.7.10, it comes as a UNIX-style command line utility and as such shows all it's capabilities when being run with the typical --help or -h options:
 
 ```
+seq.py -h
+
+
 usage: seq.py [-h] [--search SEARCHTERM] [--replace REPLACETERM]
               [--correct-wav] [--correct-wav-bpm] [--filter BPM_LIST]
               [--correct-bpm] [--hex] [--verbose]
@@ -64,29 +73,15 @@ seq.py -b "64 512" -x -s "FunkBG" -r "Blues01" .
 
 ## A more detailed usage example
 
-Show all .SEQ files in the current directory (.) that have 80 in the filename (-b "80" or --filter "80" and search for the term "FunkBG" in the file:
-
-```
-seq.py -b "80" -s FunkBG .
-```
+Show all .SEQ files in the current directory (.) that have 80 in the filename (-b "80" or --filter "80" and search for the term "FunkBG" in the file
 
 Usually this is useful if we would like to search and replace a wav files name in an audio track, but certainly also could use it to replace the name of an MPC "program file" (.PGM) somewhere in the (binary) seq file.
 
-The command's output is first showing us general meta data like the version of the sequence file, the number of bars and the bpm of the sequence.
-
-After the "End of header" marker we see that it found our searchterm "FunkBG". If you are using the script like I do, you probably would like to replace the name of the wav file configured into the seq file (or only a part of it). The name of a wav file oddly is saved in two 8 Byte chunks in different places. The script is trying to help us with finding out if it just found part of a wav file name or something else (like a pgm file name or some other string).
-
-Next are our possibilities to replace that string:
-
---replace (-r) is the simplest form of replacement and shoudld be self-explanatory.
-
---correct-wav (-w) is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the test seq file from the repo this wav and seq file names where identically already so this option currently also does not make much sense.
-
---correct-wav-bpm (-p) ist not applicable in this case. I'll show it in another example.
-
-Each of the options exactely state what they would replace, so if we are happy with one of them we just rerun the script and additionally add the replace option to the command line.
+Let's have a look at the command line and it's output:
 
 ```
+seq.py -b "80" -s FunkBG .
+
 * PATH used: .
 * searching for "FunkBG" (after End of header)
 * bpm_list: ['80']
@@ -111,6 +106,28 @@ and this would be the second half:  "80_8bar"
 ?? replace options --bpm-correct and --correct-wav-bpm won't work!
 **     it would replace "FunkBG" with "FunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
+```
+
+
+The first section of the output is showing us meta information saved in the files header like version, number of bars and the bpm of the sequence.
+
+After the "End of header" marker we see that our searchterm "FunkBG" was found.
+
+The main purpose of this python script is to replace the name's of wav files in audio tracks.
+
+Let's assume we would like to replace part of the wav files name configured into the seq file. The name of a wav file oddly is saved in two 8 Byte chunks in different places. The script is trying to help us with finding out if it just found part of a wav file name or something else (like a pgm file name or some other string).
+
+Next are our possibilities to replace that string:
+
+--replace (-r) is the simplest form of replacement and should be self-explanatory.
+
+--correct-wav (-w) is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the test seq file from the repo this wav and seq file names where identically already so this option currently also does not make much sense.
+
+--correct-wav-bpm (-p) ist not applicable in this case. I'll show it in another example.
+
+Each of the options exactely state what they would replace, so if we are happy with one of them we just rerun the script and additionally add the replace option to the command line.
+
+```
 ```
 
 For example if we chose -r to be the option to use, because we want to simply replace "FunkBG" with "PunkBG", this would be the resulting output
