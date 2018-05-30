@@ -5,7 +5,7 @@ I often use my MPC 1000 as a player for backing tracks or drum loops when practi
 
 Creating all the sequences on the MPC itself is a very tedious task, that's why I wrote this tool. I now just have to create one "template sequence" on the MPC, copy it over to the Computer, and create several (renamed) files from it. I then let the tool help me show meta information of the sequence files and do repititive tasks like replacing the filename in the audio tracks or replacing the sequences bpm values.
 
-Though I wrote it for sequence files created from a MPC 1000 running JJOS, I assume it would work with the MPC 2500's files as well, I think they share the same format. Maybe also one's from the MPC 500 would work, not sure about that. I'd certainly appreciate any testing and feedback about usage for those MPC models.
+Though I wrote it for sequence files created from a MPC 1000 running JJOS, I assume the tool would work with the MPC 2500's files as well, I think they share the same format. Maybe also the one's from the MPC 500 would work, not sure about that. I'd certainly appreciate any testing and feedback about usage with those MPC models.
 
 The utility is written in Python and was tested with version 2.7.10, it comes as a UNIX-style command line utility and as such shows all it's capabilities when being run with the typical --help or -h options:
 
@@ -75,7 +75,7 @@ seq.py -b "64 512" -x -s "FunkBG" -r "Blues01" .
 
 Show all .SEQ files in the current directory (.) that have 80 in the filename (-b "80" or --filter "80" and search for the term "FunkBG" in the file
 
-Usually this is useful if we would like to search and replace a wav files name in an audio track, but certainly also could use it to replace the name of an MPC "program file" (.PGM) somewhere in the (binary) seq file.
+Usually this is useful if we would like to search and replace a wav files name in an audio track, but we probably also could use it to replace the name of an MPC "program file" (.PGM) somewhere in the (binary) seq file.
 
 Let's have a look at the command line and it's output:
 
@@ -103,7 +103,7 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (FunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "FunkBG" with "FunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
@@ -111,26 +111,22 @@ and this would be the second half:  "80_8bar"
 
 The first section of the output is showing us meta information saved in the files header like version, number of bars and the bpm of the sequence.
 
-After the "End of header" marker we see that our searchterm "FunkBG" was found.
-
-The main purpose of this python script is to replace the name's of wav files in audio tracks.
+After the "End of header" marker we see that our searchterm "FunkBG" was found and it most likely is the start of the name of a wav file in an audio track.
 
 Let's assume we would like to replace part of the wav files name configured into the seq file. The name of a wav file oddly is saved in two 8 Byte chunks in different places. The script is trying to help us with finding out if it just found part of a wav file name or something else (like a pgm file name or some other string).
 
 Next are our possibilities to replace that string:
 
---replace (-r) is the simplest form of replacement and should be self-explanatory.
+```--replace (-r)``` is the simplest form of replacement, it just puts the REPLACETERM at the position where it found SEARCHTERM. If REPLACETERM is longer than SEARCHTERM it will overwrite remaining parts of
 
---correct-wav (-w) is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the test seq file from the repo this wav and seq file names where identically already so this option currently also does not make much sense.
 
---correct-wav-bpm (-p) ist not applicable in this case. I'll show it in another example.
+```--correct-wav (-w)``` is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the test seq file from the repo this wav and seq file names where identically already so this option currently is not very useful.
+
+```--correct-wav-bpm (-p)``` only makes sense when SEARCHTERM contains numbers that represent bpm values. I'll show it in another example.
 
 Each of the options exactely state what they would replace, so if we are happy with one of them we just rerun the script and additionally add the replace option to the command line.
 
-```
-```
-
-For example if we chose -r to be the option to use, because we want to simply replace "FunkBG" with "PunkBG", this would be the resulting output
+For example if we chose -r to be the option to use, because we want to simply replace "FunkBG" with "PunkBG", this would be the command and its resulting output:
 
 ```
 seq.py -b "80" -s FunkBG -r "PunkBG" .
@@ -196,7 +192,7 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (Punk),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "Punk" with "Punk".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
@@ -240,7 +236,7 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -263,7 +259,7 @@ and this would be the second half:	"80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -286,14 +282,14 @@ and this would be the second half:	"80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
 
 If we closely examine the output for the 3 files we'd find these useful possibilities
 
-  * --bpm-correct (-c) could correct the bpm of the sequence in files 2 and 3 (the copies)
+  * --correct-bpm (-c) could correct the bpm of the sequence in files 2 and 3 (the copies)
   * --correct-wav (-w) could replace the name of the Audio Tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
 
 If we would now use options -w and -c option we are getting the following output:
@@ -304,7 +300,7 @@ seq.py --filter Punk -s "PunkBG" -w -c
 * PATH used: .
 * searching for "PunkBG" (after End of header)
 * bpm_list: ['Punk']
-* bpm-correct is enabled!
+* correct-bpm is enabled!
 * correct-wav is enabled!
 
 ############### PunkBG_080_8bar.SEQ ################
@@ -383,7 +379,7 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -405,7 +401,7 @@ and this would be the second half:  "90_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -427,7 +423,7 @@ and this would be the second half:  "00_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --bpm-correct and --correct-wav-bpm won't work!
+?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```

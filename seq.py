@@ -237,7 +237,7 @@ if args.bpm_list:
   bpm_list = args.bpm_list.split(' ')
   print "* bpm_list:\t",  bpm_list
 if args.correct_bpm:
-  print "* bpm-correct is enabled!"
+  print "* correct-bpm is enabled!"
 if args.correct_wav:
   print "* correct-wav is enabled!"
 if args.correct_wav_bpm:
