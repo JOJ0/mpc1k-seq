@@ -156,7 +156,7 @@ def stringsearch(rest_of_file, searchterm):
   index = rest_of_file.find(searchterm)
   if index != -1:
     print "Found first occurence of SEARCHTERM at index "+str(index)+", it's "+str(length)+" chars long"
-    print "If SEARCHTERM is the START of a wav filename in an Audio Track,"
+    print "If SEARCHTERM is the START of a wav filename in an AUDIO track,"
     print "this would be the first half:\t\t\""+get_wav_first(rest_of_file, index)+"\""
     print "and this would be the second half:\t\""+get_wav_second(rest_of_file, index)+"\""
     if args.hex:
