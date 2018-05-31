@@ -184,7 +184,7 @@ def bpmfind(sometext, leading_zero=False):
     #print "DEBUG: still no bpm, before - dash search"
     splitted=sometext.split("-")
     for i in splitted:
-      i#print "DEBUG: inside dash search loop: "+i
+      #print "DEBUG: inside dash search loop: "+i
       if i.isdigit():
         if int(i) > 49:
           #print "DEBUG: bpm found, it's > 49: "+i
@@ -235,7 +235,7 @@ if args.verbose:
   print "* verbose mode is enabled"
 if args.bpm_list:
   bpm_list = args.bpm_list.split(' ')
-  print "* bpm_list:\t",  bpm_list
+  print "* bpm_list (filter_list):\t",  bpm_list
 if args.correct_bpm:
   print "* correct-bpm is enabled!"
 if args.correct_wav:
@@ -297,7 +297,7 @@ for seqfile in os.listdir(PATH):
       seqheader['bpm']=struct.unpack("<H",chunk)
       seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divide by 10 and create a tuple again
       print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", args.hex)
-      if str(seqheader['bpm'][0]) not in seqfbase and args.correct-bpm:
+      if str(seqheader['bpm'][0]) not in seqfbase and args.correct_bpm:
         print "bpm in filename is different! This will be fixed now!"
       elif str(seqheader['bpm'][0]) not in seqfbase:
         print "bpm in filename is different! Correct with --correct-bpm (-c)"
