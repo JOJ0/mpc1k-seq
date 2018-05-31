@@ -195,7 +195,6 @@ def bpmfind(sometext, leading_zero=False):
   if bpm==0:
     print "?? didn't find a possible bpm value in given term ("+sometext+"),"
     print "?? use underscores or dashes as seperating characters!"
-    print "?? replace options --bpm-correct and --correct-wav-bpm won't work! "
   if leading_zero==True:
     return str(bpm).zfill(3)
   else:
