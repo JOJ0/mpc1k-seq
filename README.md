@@ -103,7 +103,6 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (FunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "FunkBG" with "FunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
@@ -192,7 +191,6 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (Punk),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "Punk" with "Punk".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
@@ -236,7 +234,6 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -259,7 +256,6 @@ and this would be the second half:	"80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -282,7 +278,6 @@ and this would be the second half:	"80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
@@ -379,7 +374,6 @@ and this would be the second half:  "80_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -401,7 +395,6 @@ and this would be the second half:  "90_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 
@@ -423,7 +416,6 @@ and this would be the second half:  "00_8bar"
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
-?? replace options --correct-bpm and --correct-wav-bpm won't work!
 **     it would replace "PunkBG" with "PunkBG".
 ** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!
 ```
