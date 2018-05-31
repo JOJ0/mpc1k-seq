@@ -1,4 +1,5 @@
-# seq.py - an AKAI MPC 1000 sequence file command line utility
+# seq.py
+an AKAI MPC 1000 sequence file command line utility
 
 I often use my MPC 1000 as a player for backing tracks or drum loops when practicing music or just quickly want something to jam along. I usually create a drum loop in my DAW of choice and then export several wav files in different speeds. I would then copy those files on to my MPC and save one sequence for each wav file. The next time I want to practice or jam I just have to quickly load a folder of sequence and wav files and can easily switch between several speeds.
 
