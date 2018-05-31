@@ -1,11 +1,10 @@
-# mpc1k-seq
-AKAI MPC 1000 sequence file command line utility
+# seq.py - an AKAI MPC 1000 sequence file command line utility
 
 I often use my MPC 1000 as a player for backing tracks or drum loops when practicing music or just quickly want something to jam along. I usually create a drum loop in my DAW of choice and then export several wav files in different speeds. I would then copy those files on to my MPC and save one sequence for each wav file. The next time I want to practice or jam I just have to quickly load a folder of sequence and wav files and can easily switch between several speeds.
 
-Creating all the sequences on the MPC itself is a very tedious task, that's why I wrote this tool. I now just have to create one "template sequence" on the MPC, copy it over to the Computer, and create several (renamed) files from it. I then let the tool help me show meta information of the sequence files and do repititive tasks like replacing the filename in the audio tracks or replacing the sequences bpm values.
+Creating all the sequences on the MPC itself is a very tedious task, that's why I wrote this tool. I now just have to create one "template sequence" on the MPC, copy it over to the computer, and create several (renamed) files from it. I then let the tool help me show meta information of the sequence files and do repititive tasks like replacing the filename in the audio tracks or replacing the sequences bpm values.
 
-Though I wrote it for sequence files created from a MPC 1000 running JJOS, I assume the tool would work with the MPC 2500's files as well, I think they share the same format. Maybe also the one's from the MPC 500 would work, not sure about that. I'd certainly appreciate any testing and feedback about usage with those MPC models.
+Though I wrote it for sequence files created from the MPC 1000 running JJOS, I assume the tool would work with the MPC 2500's files as well, I think they share the same format. Maybe also the one's from the MPC 500 would work, not sure about that. I'd certainly appreciate any testing and feedback about usage with those MPC models files.
 
 The utility is written in Python and was tested with version 2.7.10, it comes as a UNIX-style command line utility and as such shows all it's capabilities when being run with the typical --help or -h options:
 
@@ -84,7 +83,7 @@ seq.py -b "80" -s FunkBG .
 
 * PATH used: .
 * searching for "FunkBG" (after End of header)
-* bpm_list: ['80']
+* bpm_list (filter_list): ['80']
 
 ############### FunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
@@ -92,7 +91,7 @@ seq.py -b "80" -s FunkBG .
 32:34 bpm:        80
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "FunkBG_0"
 and this would be the second half:  "80_8bar"
 ** REPLACE OPTIONS: ********************************
@@ -133,7 +132,7 @@ seq.py -b "80" -s FunkBG -r "PunkBG" .
 * PATH used: .
 * searching for "FunkBG" (after End of header)
 * replace is enabled! REPLACETERM is "PunkBG"
-* bpm_list: ['80']
+* bpm_list (filter_list): ['80']
 
 ############### FunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
@@ -141,7 +140,7 @@ seq.py -b "80" -s FunkBG -r "PunkBG" .
 32:34 bpm:        80
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "FunkBG_0"
 and this would be the second half:  "80_8bar"
 !!! replacing FIRST occurence of "FunkBG" with "PunkBG",
@@ -155,7 +154,7 @@ seq.py -b "80" -s "FunkBG" .
 
 * PATH used: .
 * searching for "FunkBG" (after End of header)
-* bpm_list: ['80']
+* bpm_list (filter_list): ['80']
 
 ############### FunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
@@ -172,7 +171,7 @@ seq.py -b "80" -s "Punk" .
 
 * PATH used: .
 * searching for "Punk" (after End of header)
-* bpm_list: ['80']
+* bpm_list (filter_list): ['80']
 
 ############### FunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
@@ -180,7 +179,7 @@ seq.py -b "80" -s "Punk" .
 32:34 bpm:        80
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 4 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
 ** REPLACE OPTIONS: ********************************
@@ -215,7 +214,7 @@ seq.py --filter Punk -s "PunkBG" .
 
 * PATH used: .
 * searching for "PunkBG" (after End of header)
-* bpm_list:	['Punk']
+* bpm_list (filter_list):	['Punk']
 
 ############### PunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
@@ -223,7 +222,7 @@ seq.py --filter Punk -s "PunkBG" .
 32:34 bpm:        80
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
 ** REPLACE OPTIONS: ********************************
@@ -245,7 +244,7 @@ and this would be the second half:  "80_8bar"
 bpm in filename is different! correct with -c
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:		"PunkBG_0"
 and this would be the second half:	"80_8bar"
 ** REPLACE OPTIONS: ********************************
@@ -267,7 +266,7 @@ and this would be the second half:	"80_8bar"
 bpm in filename is different! correct with -c
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:		"PunkBG_0"
 and this would be the second half:	"80_8bar"
 ** REPLACE OPTIONS: ********************************
@@ -285,7 +284,7 @@ and this would be the second half:	"80_8bar"
 If we closely examine the output for the 3 files we'd find these useful possibilities
 
   * --correct-bpm (-c) could correct the bpm of the sequence in files 2 and 3 (the copies)
-  * --correct-wav (-w) could replace the name of the Audio Tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
+  * --correct-wav (-w) could replace the name of the AUDIO tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
 
 If we would now use options -w and -c option we are getting the following output:
 
@@ -294,7 +293,7 @@ seq.py --filter Punk -s "PunkBG" -w -c
 
 * PATH used: .
 * searching for "PunkBG" (after End of header)
-* bpm_list: ['Punk']
+* bpm_list (filter_list): ['Punk']
 * correct-bpm is enabled!
 * correct-wav is enabled!
 
@@ -304,7 +303,7 @@ seq.py --filter Punk -s "PunkBG" -w -c
 32:34 bpm:        80
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
 -> found underscore seperated bpm value in given term: 80
@@ -321,7 +320,7 @@ and this would be the second half:  "80_8bar"
 bpm in filename is different! This will be fixed now!
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
 -> found underscore seperated bpm value in given term: 90
@@ -338,7 +337,7 @@ and this would be the second half:  "80_8bar"
 bpm in filename is different! This will be fixed now!
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
 -> found underscore seperated bpm value in given term: 100
@@ -355,7 +354,7 @@ seq.py --filter Punk -s "PunkBG" .
 
 * PATH used: .
 * searching for "PunkBG" (after End of header)
-* bpm_list: ['Punk']
+* bpm_list (filter_list): ['Punk']
 
 ############### PunkBG_080_8bar.SEQ ################
 4:20  version:    MPC1000 SEQ 4.40
@@ -363,7 +362,7 @@ seq.py --filter Punk -s "PunkBG" .
 32:34 bpm:        80
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "80_8bar"
 ** REPLACE OPTIONS: ********************************
@@ -384,7 +383,7 @@ and this would be the second half:  "80_8bar"
 32:34 bpm:        90
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_0"
 and this would be the second half:  "90_8bar"
 ** REPLACE OPTIONS: ********************************
@@ -405,7 +404,7 @@ and this would be the second half:  "90_8bar"
 32:34 bpm:        100
 ################## End of header ###################
 Found first occurence of SEARCHTERM at index 7168, it's 6 chars long
-If SEARCHTERM is the START of a wav filename in an Audio Track,
+If SEARCHTERM is the START of a wav filename in an AUDIO track,
 this would be the first half:       "PunkBG_1"
 and this would be the second half:  "00_8bar"
 ** REPLACE OPTIONS: ********************************
