@@ -348,7 +348,7 @@ and this would be the second half:  "80_8bar"
 !!! and overwriting ./PunkBG_100_8bar.SEQ ...
 ```
 
-A last check shows us that the wav file name and also the bpm have been corrected: 
+A last check is showing us that the wav file name and also the bpm have been corrected: 
 
 ```
 seq.py --filter Punk -s "PunkBG" .
