@@ -3,7 +3,7 @@ an AKAI MPC 1000 sequence file command line utility
 
 I often use my MPC 1000 as a player for backing tracks or drum loops when practicing music or just quickly want something to jam along. I usually create a drum loop in my DAW of choice and then export several wav files in different speeds. I would then copy those files on to my MPC and save one sequence for each wav file. The next time I want to practice or jam I just have to quickly load a folder of sequence and wav files and can easily switch between several speeds.
 
-Creating all the sequences on the MPC itself is a very tedious task, that's why I wrote this tool. I now just have to create one "template sequence" on the MPC, copy it over to the computer, and create several (renamed) files from it. I then let the tool help me show meta information of the sequence files and do repititive tasks like replacing the filename in the audio tracks or replacing the sequences bpm values.
+Creating all the sequences on the MPC itself is a very tedious task, that's why I wrote this tool. I now just have to create one "template sequence" on the MPC, copy it over to the computer, and create several (renamed) files from it. I then let the tool help me show meta information of the sequence files and do repititive tasks like replacing the filename in the AUDIO tracks or replacing the sequences BPM.
 
 Though I wrote it for sequence files created from the MPC 1000 running JJOS, I assume the tool would work with the MPC 2500's files as well, I think they share the same format. Maybe also the one's from the MPC 500 would work, not sure about that. I'd certainly appreciate any testing and feedback about usage with those MPC models files.
 
@@ -108,20 +108,20 @@ and this would be the second half:  "80_8bar"
 ```
 
 
-The first section of the output is showing us meta information saved in the files header like version, number of bars and the bpm of the sequence.
+The first section of the output is showing us meta information saved in the files header like version, number of bars and the BPM of the sequence.
 
-After the "End of header" marker we see that our searchterm "FunkBG" was found and it most likely is the start of the name of a wav file in an audio track.
+After the "End of header" marker we see that our searchterm "FunkBG" was found and it most likely is the start of the name of a wav file in an AUDIO track.
 
 Let's assume we would like to replace part of the wav files name configured into the seq file. The name of a wav file oddly is saved in two 8 Byte chunks in different places. The script is trying to help us with finding out if it just found part of a wav file name or something else (like a pgm file name or some other string).
 
 Next are our possibilities to replace that string:
 
-```--replace (-r)``` is the simplest form of replacement, it just puts the REPLACETERM at the position where it found SEARCHTERM. If REPLACETERM is longer than SEARCHTERM it will overwrite remaining parts of
+```--replace (-r)``` is the simplest form of replacement, it just puts the REPLACETERM at the position where it found SEARCHTERM. If REPLACETERM is longer than SEARCHTERM it will overwrite the remaining part.
 
 
 ```--correct-wav (-w)``` is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the test seq file from the repo this wav and seq file names where identically already so this option currently is not very useful.
 
-```--correct-wav-bpm (-p)``` only makes sense when SEARCHTERM contains numbers that represent bpm values. I'll show it in another example.
+```--correct-wav-bpm (-p)``` only makes sense when SEARCHTERM contains numbers that represent BPM values. I'll show it in another example.
 
 Each of the options exactely state what they would replace, so if we are happy with one of them we just rerun the script and additionally add the replace option to the command line.
 
@@ -284,7 +284,7 @@ and this would be the second half:	"80_8bar"
 
 If we closely examine the output for the 3 files we'd find these useful possibilities
 
-  * --correct-bpm (-c) could correct the bpm of the sequence in files 2 and 3 (the copies)
+  * --correct-bpm (-c) could correct the BPM of the sequence in files 2 and 3 (the copies)
   * --correct-wav (-w) could replace the name of the AUDIO tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
 
 If we would now use options -w and -c option we are getting the following output:
@@ -348,7 +348,7 @@ and this would be the second half:  "80_8bar"
 !!! and overwriting ./PunkBG_100_8bar.SEQ ...
 ```
 
-A last check is showing us that the wav file name and also the bpm have been corrected: 
+A last check is showing us that the wav file name and also the BPM have been corrected: 
 
 ```
 seq.py --filter Punk -s "PunkBG" .
