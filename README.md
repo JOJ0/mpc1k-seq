@@ -73,7 +73,7 @@ seq.py -b "64 512" -x -s "FunkBG" -r "Blues01" .
 
 ## A more detailed usage example
 
-Show all .SEQ files in the current directory (.) that have 80 in the filename (-b "80" or --filter "80" and search for the term "FunkBG" in the file
+Show all .SEQ files in the current directory (```.```) that have 80 in the filename (```-b "80"``` or ```--filter "80"``` and search for the term ```"FunkBG"``` in the file
 
 Usually this is useful if we would like to search and replace a wav files name in an audio track, but we probably also could use it to replace the name of an MPC "program file" (.PGM) somewhere in the (binary) seq file.
 
@@ -119,7 +119,7 @@ Next are our possibilities to replace that string:
 ```--replace (-r)``` is the simplest form of replacement, it just puts the REPLACETERM at the position where it found SEARCHTERM. If REPLACETERM is longer than SEARCHTERM it will overwrite the remaining part.
 
 
-```--correct-wav (-w)``` is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the test seq file from the repo this wav and seq file names where identically already so this option currently is not very useful.
+```--correct-wav (-w)``` is the option to use when our wav files are exactely identically named to our wav files (except the file ending of course). This is the option I use most. In case of the example seq file from the github repo, the wav and seq file names where identically already, so this option currently is not very useful.
 
 ```--correct-wav-bpm (-p)``` only makes sense when SEARCHTERM contains numbers that represent BPM values. I'll show it in another example.
 
@@ -207,7 +207,7 @@ cp FunkBG_080_8bar.SEQ PunkBG_090_8bar.SEQ
 cp FunkBG_080_8bar.SEQ PunkBG_100_8bar.SEQ
 ```
 
-Ok now we'd like to set the wav files name in all of the 3 "Punk sequence files" to the same as the filename. We first search for Punk and see what we have. Probably there are other seq files in this folder so we particularily select our 3 files with the --filter (-b) option:
+Ok now we'd like to set the wav files name in all of the 3 "Punk sequence files" to the same as the filename. We first search for Punk and see what we have. Probably there are other seq files in this folder so we particularily select our 3 files with the ```--filter (-b)``` option:
 
 
 ```
@@ -284,8 +284,8 @@ and this would be the second half:	"80_8bar"
 
 If we closely examine the output for the 3 files we'd find these useful possibilities
 
-  * --correct-bpm (-c) could correct the BPM of the sequence in files 2 and 3 (the copies)
-  * --correct-wav (-w) could replace the name of the AUDIO tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
+  * ```--correct-bpm (-c)``` could correct the BPM of the sequence in files 2 and 3 (the copies)
+  * ```--correct-wav (-w)``` could replace the name of the AUDIO tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
 
 If we would now use options -w and -c option we are getting the following output:
 
