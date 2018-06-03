@@ -125,7 +125,7 @@ Next are our possibilities to replace that string:
 
 Each of the options exactely state what they would replace, so if we are happy with one of them we just rerun the script and additionally add the replace option to the command line.
 
-For example if we chose -r to be the option to use, because we want to simply replace "FunkBG" with "PunkBG", this would be the command and its resulting output:
+For example if we chose ```-r``` to be the option to use, because we want to simply replace "FunkBG" with "PunkBG", this would be the command and its resulting output:
 
 ```
 seq.py -b "80" -s FunkBG -r "PunkBG" .
@@ -287,7 +287,7 @@ If we closely examine the output for the 3 files we'd find these useful possibil
   * ```--correct-bpm (-c)``` could correct the BPM of the sequence in files 2 and 3 (the copies)
   * ```--correct-wav (-w)``` could replace the name of the AUDIO tracks wav file so it's equal to the seq files name. Also in files 2 and 3 (the copies)
 
-If we would now use options -w and -c option we are getting the following output:
+If we would now use options ```-w``` and ```-c``` option we are getting the following output:
 
 ```
 seq.py --filter Punk -s "PunkBG" -w -c
@@ -370,7 +370,7 @@ and this would be the second half:  "80_8bar"
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
-**     and    "80_8bar" with "80_8bar".
+**     and              "80_8bar" with "80_8bar".
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
@@ -391,7 +391,7 @@ and this would be the second half:  "90_8bar"
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_0" with "PunkBG_0",
-**     and    "90_8bar" with "90_8bar".
+**     and              "90_8bar" with "90_8bar".
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
@@ -412,7 +412,7 @@ and this would be the second half:  "00_8bar"
 ** --replace simply replaces PunkBG with REPLACETERM.
 ** --correct-wav (-w) puts this files basename at found terms position,
 **     it would replace "PunkBG_1" with "PunkBG_1",
-**     and    "00_8bar" with "00_8bar".
+**     and              "00_8bar" with "00_8bar".
 ** --correct-wav-bpm (-p) just replaces the bpm part in the found term,
 ?? didn't find a possible bpm value in given term (PunkBG),
 ?? use underscores or dashes as seperating characters!
