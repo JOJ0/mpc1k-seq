@@ -9,7 +9,9 @@ Though I wrote it for sequence files created from the MPC 1000 running JJOS, I a
 
 ## Setup instructions
 
-Check your Python version with ```python --version```
+First of all, check if you already have a Python version on your system with ```python --version```
+
+You need Python 2.7.x
 
 ### Mac
 
@@ -17,9 +19,16 @@ Mac OS X 10.11 "El Capitan" ships with Python 2.7.6 pre-installed, which is the 
 
 If you don't have above, install the latest 2.7 package from [here](https://www.python.org/downloads/release/python-2715/) or use [homebrew](https://brew.sh) to get it.
 
+install the tool
+
+```cp seq.py /usr/local/bin/```
+
+
 ### Linux
 
-Most modern Linux Distributions already use Python 3.x by default, you would have to install a python2 package
+You most probably have a running Python version already! Check as described above!
+
+Some modern Linux Distributions already use Python 3.x by default, you would have to install a python2 package
 
 Debian based systems
 ```
@@ -31,11 +40,24 @@ Redhat based
 yum install python27
 ```
 
-Set the first line of the script to use this python version (eg ```#!/usr/bin/python2.7```)
+and set the first line of the script to use this python version (eg ```#!/usr/bin/python2.7```)
+
+
+finally, install the tool
+
+```cp seq.py /usr/local/bin/```
+
+
 
 ### Windows
 
 Download an msi installer [here](https://www.python.org/downloads/release/python-2715/)
+
+install the tool by adding the extracted directory to the system %path% variable,
+
+or just quick and dirty copy it to a path that already is in the systems search path
+
+```copy seq.py c:\windows\system32\```
 
 
 ## How to use it
