@@ -61,7 +61,8 @@ def print_chunk(chunk, data,  descr, hexflag=0):
   #return str(bytedec_beg)+"\t"+descr+data_list+"\t"+hexgroup
   return str(bytedec_beg)+":"+str(bytedec_end)+"\t"+descr+data_list+"\t"+hexgroup
 
-def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceterm="", bpm_new=0, foundindex=0):
+def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceterm="", bpm_new=0,
+                 foundindex=0, looplength=0):
   # strip possible .SEQ ending
   replaceterm=replaceterm.replace(".SEQ", "") 
   # replace string
@@ -94,7 +95,11 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
   bytestring+=struct.pack("<1H", *seqheader['some_number02'])
   bytestring+=struct.pack("16s", *seqheader['version'])
   bytestring+=struct.pack("<4H", *seqheader['some_number03'])
-  bytestring+=struct.pack("<1H", *seqheader['bars'])
+  if looplength > 0:
+    print "!!! replacing looplength (bars) value, "
+    bytestring+=struct.pack("<1H", looplength)
+  else:
+    bytestring+=struct.pack("<1H", *seqheader['bars'])
   bytestring+=struct.pack("<1H", *seqheader['some_number07'])
   if bpm_new > 0:
     print "!!! replacing bpm value, "
@@ -218,6 +223,44 @@ def header_delimiter(position, seqfile):
     line=line+"#"
   return line
 
+def looplength_find(sometext, leading_zero=False):
+  """finds possible looplength (bars) values in strings"""
+  """leading_zero=True returns string instead of int!"""
+  print "DEBUG: looplength_find looking for looplength in: "+sometext
+  looplength=0
+  marker="b"
+  splitted=sometext.split("_")
+  for i in splitted:
+    print "DEBUG: looplength_find: this is i: "+i
+    if i.isalnum():
+      print "DEBUG: looplength_find found alnum in: "+i
+      if i.endswith(marker):
+        i_without_marker=i.replace(marker, "")
+        if i_without_marker.isdigit():
+          looplength=int(i_without_marker)
+          #if leading_zero==False:
+          print "-> found underscore seperated looplength value in given term: "+str(looplength)
+  # if we still dont have a possible looplength value, continue with dash search
+  if looplength==0:
+    #print "DEBUG: still no looplength, before - dash search"
+    splitted=sometext.split("-")
+    for i in splitted:
+      #print "DEBUG: inside dash search loop: "+i
+      if i.isdigit():
+        if int(i) > 49:
+          #print "DEBUG: looplength found, it's > 49: "+i
+          looplength=int(i)
+          if leading_zero==False:
+            print "-> found dash seperated looplength value in given term: "+str(looplength)
+  # if we still dont have a looplength value, give up!
+  if looplength==0:
+    print "?? didn't find a possible looplength value in given term ("+sometext+"),"
+    print "?? use underscores or dashes as seperating characters!"
+  if leading_zero==True:
+    return str(looplength).zfill(3)
+  else:
+    return int(looplength)
+
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.SEQ files to be processed")
 parser.add_argument("--search", "-s", help="search for given string in file contents", type=str, dest="searchterm")
@@ -226,6 +269,7 @@ parser.add_argument("--correct-wav", "-w", help="sets basename of .SEQ file to t
 parser.add_argument("--correct-wav-bpm", "-p", help="replace BPM in found SEARCHTERM with BPM found in filename", action="store_true")
 parser.add_argument("--filter", "--bpm", "-b", help="historically was used as a space seperated BPM list but actually it is a simple filter: only filenames containing one of the strings in the list, will be processed", type=str, dest="bpm_list")
 parser.add_argument("--correct-bpm", "-c", help="set BPM to the same as in filename", action="store_true")
+parser.add_argument("--correct-length", "-l", help="set the sequences looplength (bars) to the same as in filename. Assumes value in filename is marked with trailing \"b\" (eg 8b)", action="store_true")
 parser.add_argument("--hex", "-x", help="show hex values next to decimal and strings", action="store_true")
 parser.add_argument("--verbose", "-v", help="also show border markers and not yet studied header information", action="store_true")
 args = parser.parse_args()
@@ -259,6 +303,8 @@ if args.correct_wav:
   print "* correct-wav is enabled!"
 if args.correct_wav_bpm:
   print "* correct-wav-bpm is enabled!"
+if args.correct_length:
+  print "* correct-length is enabled!"
 print "" # just some space
 
 
@@ -289,6 +335,10 @@ for seqfile in os.listdir(PATH):
       chunk = read_and_tell(2) # read next bytes
       seqheader['bars']=struct.unpack("<H",chunk)
       print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", args.hex)
+      if str(seqheader['bars'][0])+"b" not in seqfbase and args.correct_length:
+        print "loooplength (bars) in filename is different! This will be fixed now!"
+      elif str(seqheader['bars'][0])+"b" not in seqfbase:
+        print "loooplength (bars) in filename is different! Correct with --correct-length (-l)"
       chunk = read_and_tell(2)
       seqheader['some_number07']=struct.unpack("<H",chunk)
       if args.verbose:
@@ -324,11 +374,17 @@ for seqfile in os.listdir(PATH):
         foundindex=stringsearch(rest_of_file, args.searchterm)
         # several possible write combinations:
         # write file if FOUND, CORRECT_WAV and BPM
-        if foundindex >0 and args.correct_wav and args.correct_bpm:
-          writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, bpmfind(seqfile), foundindex)
+        if foundindex >0 and args.correct_wav and args.correct_bpm and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, bpmfind(seqfile),
+                       foundindex, looplength=looplength_find(seqfbase))
+        # write file if FOUND, CORRECT_WAV and BPM
+        elif foundindex >0 and args.correct_wav and args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, bpmfind(seqfile),
+                       foundindex)
         # write file if FOUND, REPLACE and BPM
         elif foundindex >0 and args.replaceterm and args.correct_bpm:
-          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, bpmfind(seqfile), foundindex)
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, bpmfind(seqfile),
+                       foundindex)
         # write file if FOUND, CORRECT_WAV_BPM and BPM
         elif foundindex >0 and args.correct_wav_bpm and args.correct_bpm:
           writeseqfile(f, seqheader, rest_of_file, args.searchterm, "wav_bpm_replace", bpmfind(seqfile), foundindex)
@@ -359,9 +415,13 @@ for seqfile in os.listdir(PATH):
           print "** If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
           if args.correct_bpm:
             writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
+          if args.correct_length:
+            writeseqfile(f, seqheader, rest_of_file, "", "", looplength=looplength_find(seqfbase))
       else:
         if args.correct_bpm:
           writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
+        if args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, "", "", looplength=looplength_find(seqfbase))
         # only print this if NOT replacing string
         #print "run script again with --replace 'replaceterm' to replace 'searchterm'"
         #print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
