@@ -200,6 +200,24 @@ def bpmfind(sometext, leading_zero=False):
   else:
     return int(bpm)
 
+def header_delimiter(position, seqfile):
+  maxlength=50
+  j=0
+  delim=""
+  if position=="end":
+    seqfile="End of header"
+  namelength=len(seqfile)
+  missing=maxlength-namelength
+  #print "missing to maxlength:", missing
+  #print "half of missing:", missing/2
+  while j < missing/2:
+    delim=delim+"#"
+    j+=1
+  line=delim+" "+seqfile+" "+delim 
+  if missing % 2 != 0:
+    line=line+"#"
+  return line
+
 parser = argparse.ArgumentParser()
 parser.add_argument("path", help="path of *.SEQ files to be processed")
 parser.add_argument("--search", "-s", help="search for given string in file contents", type=str, dest="searchterm")
@@ -243,23 +261,6 @@ if args.correct_wav_bpm:
   print "* correct-wav-bpm is enabled!"
 print "" # just some space
 
-def header_delimiter(position, seqfile):
-  maxlength=50
-  j=0
-  delim=""
-  if position=="end":
-    seqfile="End of header"
-  namelength=len(seqfile)
-  missing=maxlength-namelength
-  #print "missing to maxlength:", missing
-  #print "half of missing:", missing/2
-  while j < missing/2:
-    delim=delim+"#"
-    j+=1
-  line=delim+" "+seqfile+" "+delim 
-  if missing % 2 != 0:
-    line=line+"#"
-  return line
 
 for seqfile in os.listdir(PATH):
   if (seqfile.endswith(".SEQ") and args.bpm_list is None) or (seqfile.endswith(".SEQ") and any(bpm in seqfile for bpm in bpm_list)):
