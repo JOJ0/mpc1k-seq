@@ -454,6 +454,7 @@ for seqfile in os.listdir(PATH):
         #print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
       print ""
 
+def old_code_for_reference():
       # keeping old version and other stuff for reference here:
       #
       #seqheader['fileversion']=struct.unpack('B',didson_data[3:4])[0]
