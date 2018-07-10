@@ -226,36 +226,38 @@ def header_delimiter(position, seqfile):
 def looplength_find(sometext, leading_zero=False):
   """finds possible looplength (bars) values in strings"""
   """leading_zero=True returns string instead of int!"""
-  print "DEBUG: looplength_find looking for looplength in: "+sometext
+  #print "DEBUG: looplength_find looking for looplength in: "+sometext
   looplength=0
   marker="b"
-  splitted=sometext.split("_")
-  for i in splitted:
-    print "DEBUG: looplength_find: this is i: "+i
-    if i.isalnum():
-      print "DEBUG: looplength_find found alnum in: "+i
-      if i.endswith(marker):
-        i_without_marker=i.replace(marker, "")
-        if i_without_marker.isdigit():
-          looplength=int(i_without_marker)
-          #if leading_zero==False:
-          print "-> found underscore seperated looplength value in given term: "+str(looplength)
-  # if we still dont have a possible looplength value, continue with dash search
-  if looplength==0:
-    #print "DEBUG: still no looplength, before - dash search"
-    splitted=sometext.split("-")
+  def _finder(text, seperator, marker):
+    splitted=text.split(seperator)
     for i in splitted:
-      #print "DEBUG: inside dash search loop: "+i
-      if i.isdigit():
-        if int(i) > 49:
-          #print "DEBUG: looplength found, it's > 49: "+i
-          looplength=int(i)
-          if leading_zero==False:
-            print "-> found dash seperated looplength value in given term: "+str(looplength)
+      #print "DEBUG: looplength_find: this is i: "+i
+      if i.isalnum():
+        #print "DEBUG: looplength_find: found alnum in: "+i
+        if i.endswith(marker):
+          i_without_marker=i.replace(marker, "")
+          if i_without_marker.isdigit():
+            return int(i_without_marker)
+    return 0
+
+  looplength=_finder(sometext, "_", marker)
+  if looplength > 0:
+    if leading_zero==False:
+      print "-> found underscore seperated looplength value in given term: "+str(looplength)
+  # if we still dont have a possible looplength value, continue with dash search
+  elif looplength==0:
+    looplength=_finder(sometext, "-", marker)
+    if looplength > 0:
+      #print "DEBUG: still no looplength, before - dash search"
+      if leading_zero==False:
+        print "-> found dash seperated looplength value in given term: "+str(looplength)
+
   # if we still dont have a looplength value, give up!
   if looplength==0:
     print "?? didn't find a possible looplength value in given term ("+sometext+"),"
     print "?? use underscores or dashes as seperating characters!"
+    return 0
   if leading_zero==True:
     return str(looplength).zfill(3)
   else:
@@ -336,9 +338,9 @@ for seqfile in os.listdir(PATH):
       seqheader['bars']=struct.unpack("<H",chunk)
       print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", args.hex)
       if str(seqheader['bars'][0])+"b" not in seqfbase and args.correct_length:
-        print "loooplength (bars) in filename is different! This will be fixed now!"
+        print "looplength (bars) in filename is different! This will be fixed now!"
       elif str(seqheader['bars'][0])+"b" not in seqfbase:
-        print "loooplength (bars) in filename is different! Correct with --correct-length (-l)"
+        print "looplength (bars) in filename is different! Correct with --correct-length (-l)"
       chunk = read_and_tell(2)
       seqheader['some_number07']=struct.unpack("<H",chunk)
       if args.verbose:
@@ -373,31 +375,56 @@ for seqfile in os.listdir(PATH):
       if args.searchterm:
         foundindex=stringsearch(rest_of_file, args.searchterm)
         # several possible write combinations:
-        # write file if FOUND, CORRECT_WAV and BPM
+        # write file if FOUND, CORRECT_WAV, BPM, LENGTH
         if foundindex >0 and args.correct_wav and args.correct_bpm and args.correct_length:
           writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, bpmfind(seqfile),
                        foundindex, looplength=looplength_find(seqfbase))
-        # write file if FOUND, CORRECT_WAV and BPM
+        # write file if FOUND, CORRECT_WAV, BPM
         elif foundindex >0 and args.correct_wav and args.correct_bpm:
           writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, bpmfind(seqfile),
                        foundindex)
-        # write file if FOUND, REPLACE and BPM
+        # write file if FOUND, REPLACE, BPM, LENGTH
+        elif foundindex >0 and args.replaceterm and args.correct_bpm and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, bpmfind(seqfile),
+                       foundindex, looplength=looplength_find(seqfbase))
+        # write file if FOUND, REPLACE, BPM
         elif foundindex >0 and args.replaceterm and args.correct_bpm:
           writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, bpmfind(seqfile),
                        foundindex)
-        # write file if FOUND, CORRECT_WAV_BPM and BPM
+        # write file if FOUND, CORRECT_WAV_BPM, BPM, LENGTH
+        elif foundindex >0 and args.correct_wav_bpm and args.correct_bpm and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, "wav_bpm_replace",
+                       bpmfind(seqfile), foundindex, looplength=looplength_find(seqfbase))
+        # write file if FOUND, CORRECT_WAV_BPM, BPM
         elif foundindex >0 and args.correct_wav_bpm and args.correct_bpm:
-          writeseqfile(f, seqheader, rest_of_file, args.searchterm, "wav_bpm_replace", bpmfind(seqfile), foundindex)
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, "wav_bpm_replace",
+                       bpmfind(seqfile), foundindex)
+        # write file if FOUND, REPLACE, LENGTH
+        elif foundindex >0 and args.replaceterm and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, 0, foundindex,
+                       looplength=looplength_find(seqfbase))
         # write file if FOUND, REPLACE
         elif foundindex >0 and args.replaceterm:
           writeseqfile(f, seqheader, rest_of_file, args.searchterm, args.replaceterm, 0, foundindex)
+        # write file if FOUND, CORRECT_WAV, LENGTH
+        elif foundindex >0 and args.correct_wav and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, 0, foundindex,
+                       looplength=looplength_find(seqfbase))
         # write file if FOUND and CORRECT_WAV
         elif foundindex >0 and args.correct_wav:
           writeseqfile(f, seqheader, rest_of_file, args.searchterm, seqfile, 0, foundindex)
+        # write file if FOUND, CORRECT_WAV_BPM and LENGTH
+        elif foundindex >0 and args.correct_wav_bpm and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, args.searchterm, "wav_bpm_replace", 0, foundindex,
+                       looplength=looplength_find(seqfbase))
         # write file if FOUND and CORRECT_WAV_BPM
         elif foundindex >0 and args.correct_wav_bpm:
           writeseqfile(f, seqheader, rest_of_file, args.searchterm, "wav_bpm_replace", 0, foundindex)
-        # write file if NOTHING is found and CORRECT_BPM
+        # write file if NOTHING is found, CORRECT_BPM, LENGTH
+        elif foundindex==0 and args.correct_bpm and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile),
+                       looplength=looplength_find(seqfbase))
+        # write file if NOTHING is found, CORRECT_BPM
         elif foundindex==0 and args.correct_bpm:
           writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
         # only print this if we found something but are NOT replacing it already
