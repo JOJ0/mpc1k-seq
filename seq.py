@@ -444,11 +444,14 @@ for seqfile in os.listdir(PATH):
             writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
           if args.correct_length:
             writeseqfile(f, seqheader, rest_of_file, "", "", looplength=looplength_find(seqfbase))
-      else:
-        if args.correct_bpm:
-          writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
-        if args.correct_length:
+      else: # whithout --search
+        if args.correct_bpm and args.correct_length:
+          writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile),
+                       looplength=looplength_find(seqfbase))
+        elif args.correct_length:
           writeseqfile(f, seqheader, rest_of_file, "", "", looplength=looplength_find(seqfbase))
+        elif args.correct_bpm:
+          writeseqfile(f, seqheader, rest_of_file, "", "", bpmfind(seqfile))
         # only print this if NOT replacing string
         #print "run script again with --replace 'replaceterm' to replace 'searchterm'"
         #print "If this all looks like crap, don't do it! Existing files will be OVERWRITTEN!"
