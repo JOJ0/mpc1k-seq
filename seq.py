@@ -39,12 +39,11 @@ def chunk2bytearray(chunk):
   bytearray=[chunk[i:i+1] for i in range (0, len(chunk), 1)]
   return bytearray
 
-def read_and_tell(to_byte):
+def read_and_tell(to_byte, fileobj):
   """read up to specific byte number, set bytedec+bytehex to current position"""
-  """the file objects name is hardcoded *grauslich*"""
   global bytedec_beg, bytehex_beg, bytedec_end, bytehex_end
-  chunk = f.read(to_byte)
-  bytedec_end=f.tell()
+  chunk = fileobj.read(to_byte)
+  bytedec_end=fileobj.tell()
   bytehex_end="{0:#0{1}x}".format(bytedec_end,6)
   bytedec_beg = bytedec_end - to_byte
   bytehex_beg="{0:#0{1}x}".format(bytedec_beg,6)
@@ -319,33 +318,33 @@ for seqfile in os.listdir(PATH):
       # header data will be written into this dictionary,
       # each element read from struct.unpack is a tuple!
       seqheader={}
-      chunk = read_and_tell(2) # read next bytes
+      chunk = read_and_tell(2, f) # read next bytes
       seqheader['some_number01']=struct.unpack("<H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number01'], "first 2 bytes\t\t", args.hex)
-      chunk = read_and_tell(2) # read next bytes
+      chunk = read_and_tell(2, f) # read next bytes
       seqheader['some_number02']=struct.unpack("<H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number02'], "zero:\t\t\t", args.hex)
-      chunk = read_and_tell(16) # read next bytes
+      chunk = read_and_tell(16, f) # read next bytes
       seqheader['version']=struct.unpack("16s",chunk)
       print print_chunk(chunk, seqheader['version'], "version:\t\t", args.hex)
-      chunk = read_and_tell(8) # read next bytes
+      chunk = read_and_tell(8, f) # read next bytes
       seqheader['some_number03']=struct.unpack("<4H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number03'], "some shorts:\t\t", args.hex)
-      chunk = read_and_tell(2) # read next bytes
+      chunk = read_and_tell(2, f) # read next bytes
       seqheader['bars']=struct.unpack("<H",chunk)
       print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", args.hex)
       if str(seqheader['bars'][0])+"b" not in seqfbase and args.correct_length:
         print "looplength (bars) in filename is different! This will be fixed now!"
       elif str(seqheader['bars'][0])+"b" not in seqfbase:
         print "looplength (bars) in filename is different! Correct with --correct-length (-l)"
-      chunk = read_and_tell(2)
+      chunk = read_and_tell(2, f)
       seqheader['some_number07']=struct.unpack("<H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['some_number07'], "zero:\t\t\t", args.hex)
-      chunk = read_and_tell(2)
+      chunk = read_and_tell(2, f)
       seqheader['bpm']=struct.unpack("<H",chunk)
       seqheader['bpm']=(seqheader['bpm'][0]/10, ) # divide by 10 and create a tuple again
       print print_chunk(chunk, seqheader['bpm'], "bpm:\t\t\t", args.hex)
@@ -353,16 +352,16 @@ for seqfile in os.listdir(PATH):
         print "bpm in filename is different! This will be fixed now!"
       elif str(seqheader['bpm'][0]) not in seqfbase:
         print "bpm in filename is different! Correct with --correct-bpm (-c)"
-      chunk = read_and_tell(14)
+      chunk = read_and_tell(14, f)
       seqheader['some_number08']=struct.unpack("<7H",chunk) # 3 ints
       if args.verbose:
         # maybe this actually is the end of header boundary?
         print print_chunk(chunk, seqheader['some_number08'], "some zeroes:\t\t", args.hex)
-      chunk = read_and_tell(4)
+      chunk = read_and_tell(4, f)
       seqheader['tempo_map01']=struct.unpack("<2H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['tempo_map01'], "tempo map 01:\t\t", args.hex)
-      chunk = read_and_tell(4)
+      chunk = read_and_tell(4, f)
       seqheader['tempo_map02']=struct.unpack("<2H",chunk)
       if args.verbose:
         print print_chunk(chunk, seqheader['tempo_map02'], "tempo map 02:\t\t", args.hex)
