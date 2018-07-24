@@ -222,7 +222,7 @@ def header_delimiter(position, seqfile):
     line=line+"#"
   return line
 
-def looplength_find(sometext, leading_zero=False):
+def looplength_find(sometext, leading_zero=False, silent=False):
   """finds possible looplength (bars) values in strings"""
   """leading_zero=True returns string instead of int!"""
   #print "DEBUG: looplength_find looking for looplength in: "+sometext
@@ -243,20 +243,23 @@ def looplength_find(sometext, leading_zero=False):
   looplength=_finder(sometext, "_", marker)
   if looplength > 0:
     if leading_zero==False:
-      print "-> found underscore seperated looplength value in given term: "+str(looplength)
+      if not silent:
+        print "-> found underscore seperated looplength value in given term: "+str(looplength)
   # if we still dont have a possible looplength value, continue with dash search
   elif looplength==0:
     looplength=_finder(sometext, "-", marker)
     if looplength > 0:
       #print "DEBUG: still no looplength, before - dash search"
       if leading_zero==False:
-        print "-> found dash seperated looplength value in given term: "+str(looplength)
+        if not silent:
+          print "-> found dash seperated looplength value in given term: "+str(looplength)
 
   # if we still dont have a looplength value, give up!
   if looplength==0:
-    print "?? didn't find a possible looplength value in given term ("+sometext+"),"
-    print "?? use underscores or dashes as seperating characters!"
-    return 0
+    if not silent:
+      print "?? didn't find a possible looplength value in given term ("+sometext+"),"
+      print "?? use underscores or dashes as seperating characters!"
+      return 0
   if leading_zero==True:
     return str(looplength).zfill(3)
   else:
@@ -335,11 +338,15 @@ for seqfile in os.listdir(PATH):
         print print_chunk(chunk, seqheader['some_number03'], "some shorts:\t\t", args.hex)
       chunk = read_and_tell(2, f) # read next bytes
       seqheader['bars']=struct.unpack("<H",chunk)
-      print print_chunk(chunk, seqheader['bars'], "bars:\t\t\t", args.hex)
-      if str(seqheader['bars'][0])+"b" not in seqfbase and args.correct_length:
-        print "looplength (bars) in filename is different! This will be fixed now!"
-      elif str(seqheader['bars'][0])+"b" not in seqfbase:
-        print "looplength (bars) in filename is different! Correct with --correct-length (-l)"
+      print print_chunk(chunk, seqheader['bars'], "length (bars):\t\t", args.hex)
+      #if str(seqheader['bars'][0])+"b" not in seqfbase and args.correct_length:
+      looplength=looplength_find(seqfbase, leading_zero=False, silent=True)
+      if (looplength is not 0) and (looplength is not seqheader['bars'][0]):
+        #print looplength
+        if args.correct_length:
+          print "looplength in filename is different! This will be fixed now!"
+        else:
+          print "looplength in filename is different! Correct with --correct-length (-l)"
       chunk = read_and_tell(2, f)
       seqheader['some_number07']=struct.unpack("<H",chunk)
       if args.verbose:
