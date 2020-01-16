@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import sys
 import os
 import string
@@ -67,7 +67,7 @@ def writeseqfile(currentfile, seqheader, rest_of_file, searchterm="", replaceter
   # replace string
   if replaceterm:
     if len(replaceterm) > 16:
-      print "replaceterm ("+replaceterm+") too long, max chars: 16, truncating!\n"
+      print 'replaceterm ("{}") too long, max chars: 16, truncating!\n'.format(replaceterm)
       replaceterm=replaceterm[0:16]
     if replaceterm=="wav_bpm_replace":
       replaceterm=string_bpm_replace(args.searchterm, seqfile)
