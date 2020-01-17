@@ -94,6 +94,9 @@ optional arguments:
                         containing one of the strings in the list, will be
                         processed
   --correct-bpm, -c     set BPM to the same as in filename
+  --correct-length, -l  set the sequences looplength (bars) to the same as in
+                        filename. Assumes value in filename is marked with
+                        trailing "b" (eg 8b)
   --hex, -x             show hex values next to decimal and strings
   --verbose, -v         also show border markers and not yet studied header
                         information
