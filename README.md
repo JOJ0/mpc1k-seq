@@ -11,18 +11,18 @@ Though I wrote it for sequence files created from the MPC 1000 running JJOS, I a
 
 ### Using the self-contained executables
 
-If you don't want to bother with installing Python on your OS, and are not interested in running the latest development version of seq, just use the self-contained executables, available since release v1.2: https://github.com/JOJ0/mpc1k-seq/releases/tag/v1.2
+If you don't want to bother with installing Python on your OS, and are not interested in running the latest development version, just use the self-contained executables available since release v1.2: https://github.com/JOJ0/mpc1k-seq/releases/tag/v1.2
 
 - For Windows 10 download `seq.exe`
 - For MacOS X 10.13 download `seq` (not sure if newer MacOS versions will work, please report back any problems)
 
-To be able to execute `seq` from anywhere on your system copy it to a place that is searched for:
+To be able to execute `seq` from anywhere on your system, copy it to a place that is searched for:
 
 #### Windows
 
 Use Windows Explorer to copy the seq.exe file to c:\windows\system32\
 
-Note that this is a dirty hack. If you don't want to do this or don't have the privileges to do it, on your command prompt you can always just "cd" to the place where seq.exe is saved and just execute it from there :-)
+Note that this is a dirty hack. If you don't want to do this or don't have the privileges to do it, on your command prompt you can always just "cd" to the place where seq.exe is saved and execute it from there :-)
 
 #### Mac OS
 
@@ -96,7 +96,7 @@ finally, install the tool
 
 ## How to use it
 
-_In case you are using the developement version you would have to execute seq.py instead of seq. Further note that the Windows seq.exe can be executed without the .exe ending. The MacOS executable is called just seq and doesn't have a file ending_
+_In case you are using the developement version, you would have to execute seq.py instead of seq. Further note that the Windows seq.exe can be executed without the .exe ending. The MacOS executable is called just seq and doesn't have a file ending_
 
 The utility comes as a UNIX-style command line utility and as such shows all it's capabilities when being run with the typical --help or -h options:
 
