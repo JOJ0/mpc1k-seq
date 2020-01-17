@@ -1,4 +1,4 @@
-# seq.py
+# seq
 an AKAI MPC 1000 sequence file command line utility
 
 I often use my MPC 1000 as a player for backing tracks or drum loops when practicing music or just quickly want something to jam along. I usually create a drum loop in my DAW of choice and then export several wav files in different speeds. I would then copy those files on to my MPC and save one sequence for each wav file. The next time I want to practice or jam I just have to quickly load a folder of sequence and wav files and can easily switch between several speeds.
@@ -9,11 +9,54 @@ Though I wrote it for sequence files created from the MPC 1000 running JJOS, I a
 
 ## Setup instructions
 
+### Using the self-contained executables
+
+If you don't want to bother with installing Python on your OS, and are not interested in running the latest development version of seq, just use the self-contained executables, available since release v1.2: https://github.com/JOJ0/mpc1k-seq/releases/tag/v1.2
+
+- For Windows 10 download `seq.exe`
+- For MacOS X 10.13 download `seq` (not sure if newer MacOS versions will work, please report back any problems)
+
+To be able to execute `seq` from anywhere on your system copy it to a place that is searched for:
+
+#### Windows
+
+Use Windows Explorer to copy the seq.exe file to c:\windows\system32\
+
+Note that this is a dirty hack. If you don't want to do this or don't have the privileges to do it, on your command prompt you can always just "cd" to the place where seq.exe is saved and just execute it from there :-)
+
+#### Mac OS
+
+Make sure you are residing inside the directory where seq is saved. Your user needs to have admin privileges. You will be asked for your password when executing the following command:
+
+`sudo cp seq /usr/local/bin/`
+
+#### Linux
+
+Please just follow the steps in the following chapter!
+
+
+
+### Installing the latest development version
+
+_skip this chapter if you are using the executables as describe above_
+
 First of all, check if you already have a Python version on your system with ```python --version```
 
 You need Python 2.7.x
 
-### Mac
+
+#### Windows
+
+Download an msi installer [here](https://www.python.org/downloads/release/python-2715/)
+
+install the tool by adding the extracted directory to the system %path% variable,
+
+or just quick and dirty copy it to a path that already is in the systems search path
+
+```copy seq c:\windows\system32\```
+
+
+#### Mac
 
 Mac OS X 10.11 "El Capitan" ships with Python 2.7.6 pre-installed, which is the version the utility was developed on and is tested with. OX X 10.8 had Python 2.6, which probably also would work. 10.9 and newer all have 2.7.x, which should be fine.
 
@@ -21,10 +64,10 @@ If you don't have above, install the latest 2.7 package from [here](https://www.
 
 install the tool
 
-```cp seq.py /usr/local/bin/```
+```cp seq /usr/local/bin/```
 
 
-### Linux
+#### Linux
 
 You most probably have a running Python version already! Check as described above!
 
@@ -45,30 +88,23 @@ and set the first line of the script to use this python version (eg ```#!/usr/bi
 
 finally, install the tool
 
-```cp seq.py /usr/local/bin/```
+```cp seq /usr/local/bin/```
 
 
 
-### Windows
-
-Download an msi installer [here](https://www.python.org/downloads/release/python-2715/)
-
-install the tool by adding the extracted directory to the system %path% variable,
-
-or just quick and dirty copy it to a path that already is in the systems search path
-
-```copy seq.py c:\windows\system32\```
 
 
 ## How to use it
 
+_In case you are using the developement version you would have to execute seq.py instead of seq. Further note that the Windows seq.exe can be executed without the .exe ending. The MacOS executable is called just seq and doesn't have a file ending_
+
 The utility comes as a UNIX-style command line utility and as such shows all it's capabilities when being run with the typical --help or -h options:
 
 ```
-seq.py -h
+seq -h
 
 
-usage: seq.py [-h] [--search SEARCHTERM] [--replace REPLACETERM]
+usage: seq [-h] [--search SEARCHTERM] [--replace REPLACETERM]
               [--correct-wav] [--correct-wav-bpm] [--filter BPM_LIST]
               [--correct-bpm] [--hex] [--verbose]
               path
@@ -106,26 +142,26 @@ optional arguments:
 
 just show meta information of all seq files in current directory
 ```
-seq.py .
+seq .
 ```
 
 show info of all seq files that have 64 or 512 in the filename (usually BPM values)
 ```
-seq.py -b "64 512" .
+seq -b "64 512" .
 ```
 also display values in hex
 ```
-seq.py -b "64 512" -x .
+seq -b "64 512" -x .
 ```
 search for a string
 ```
-seq.py -b "64 512" -x -s "FunkBG" .
+seq -b "64 512" -x -s "FunkBG" .
 ```
 replace _first occurence_ of SEARCHTERM with REPLACETERM (run script again to replace next instance of SEARCHTERM)
 
 FIXME - "replacecount" may be configurable in future releases
 ```
-seq.py -b "64 512" -x -s "FunkBG" -r "Blues01" .
+seq -b "64 512" -x -s "FunkBG" -r "Blues01" .
 ```
 
 
@@ -138,7 +174,7 @@ Usually this is useful if we would like to search and replace a wav files name i
 Let's have a look at the command line and it's output:
 
 ```
-seq.py -b "80" -s FunkBG .
+seq -b "80" -s FunkBG .
 
 * PATH used: .
 * searching for "FunkBG" (after End of header)
@@ -186,7 +222,7 @@ Each of the options exactely state what they would replace, so if we are happy w
 For example if we chose ```-r``` to be the option to use, because we want to simply replace "FunkBG" with "PunkBG", this would be the command and its resulting output:
 
 ```
-seq.py -b "80" -s FunkBG -r "PunkBG" .
+seq -b "80" -s FunkBG -r "PunkBG" .
 
 * PATH used: .
 * searching for "FunkBG" (after End of header)
@@ -209,7 +245,7 @@ and this would be the second half:  "80_8bar"
 If we now search for FunkBG again, we certainly won't find it anymore:
 
 ```
-seq.py -b "80" -s "FunkBG" .
+seq -b "80" -s "FunkBG" .
 
 * PATH used: .
 * searching for "FunkBG" (after End of header)
@@ -226,7 +262,7 @@ your SEARCHTERM "FunkBG" was not found!
 Punk would instead be found and we _would have_ similar options as with our first search above:
 
 ```
-seq.py -b "80" -s "Punk" .
+seq -b "80" -s "Punk" .
 
 * PATH used: .
 * searching for "Punk" (after End of header)
@@ -269,7 +305,7 @@ Ok now we'd like to set the wav files name in all of the 3 "Punk sequence files"
 
 
 ```
-seq.py --filter Punk -s "PunkBG" .
+seq --filter Punk -s "PunkBG" .
 
 * PATH used: .
 * searching for "PunkBG" (after End of header)
@@ -348,7 +384,7 @@ If we closely examine the output for the 3 files we'd find these useful possibil
 If we would now use options ```-w``` and ```-c``` option we are getting the following output:
 
 ```
-seq.py --filter Punk -s "PunkBG" -w -c
+seq --filter Punk -s "PunkBG" -w -c
 
 * PATH used: .
 * searching for "PunkBG" (after End of header)
@@ -409,7 +445,7 @@ and this would be the second half:  "80_8bar"
 A last check is showing us that the wav file name and also the BPM have been corrected: 
 
 ```
-seq.py --filter Punk -s "PunkBG" .
+seq --filter Punk -s "PunkBG" .
 
 * PATH used: .
 * searching for "PunkBG" (after End of header)
