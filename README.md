@@ -36,7 +36,7 @@ Please just follow the steps in the following chapter!
 
 
 
-### Installing the latest development version
+### Using the latest development version
 
 _skip this chapter if you are using the executables as describe above_
 
@@ -44,27 +44,34 @@ First of all, check if you already have a Python version on your system with ```
 
 You need Python 2.7.x
 
+Clone the github repo and jump into the directory.
+
+```
+git clone https://github.com/JOJ0/mpc1k-seq.git
+cd mpc1k-seq
+```
+
 
 #### Windows
 
-Download an msi installer [here](https://www.python.org/downloads/release/python-2715/)
+Download an msi installer [here](https://www.python.org/downloads/release/python-2717/)
 
-install the tool by adding the extracted directory to the system %path% variable,
+install the tool by adding the cloned repo directory to the system %path% variable,
 
 or just quick and dirty copy it to a path that already is in the systems search path
 
-```copy seq c:\windows\system32\```
+```copy seq.py c:\windows\system32\```
 
 
 #### Mac
 
 Mac OS X 10.11 "El Capitan" ships with Python 2.7.6 pre-installed, which is the version the utility was developed on and is tested with. OX X 10.8 had Python 2.6, which probably also would work. 10.9 and newer all have 2.7.x, which should be fine.
 
-If you don't have above, install the latest 2.7 package from [here](https://www.python.org/downloads/release/python-2715/) or use [homebrew](https://brew.sh) to get it.
+If you don't have above, install the latest 2.7 package from [here](https://www.python.org/downloads/release/python-2717/) or use [homebrew](https://brew.sh) to get it.
 
 install the tool
 
-```cp seq /usr/local/bin/```
+```cp seq.py /usr/local/bin/```
 
 
 #### Linux
@@ -88,7 +95,7 @@ and set the first line of the script to use this python version (eg ```#!/usr/bi
 
 finally, install the tool
 
-```cp seq /usr/local/bin/```
+```cp seq.py /usr/local/bin/```
 
 
 
